@@ -44,6 +44,7 @@ export function AuthenticatedLayout(): JSX.Element {
               type="button"
               onClick={() => setMenuOpen((v) => !v)}
               className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+              data-cy="header-user-menu"
             >
               <span className="inline-block h-6 w-6 rounded-full bg-brand-600 text-center text-xs font-semibold leading-6 text-white">
                 {user?.name?.charAt(0).toUpperCase() ?? '?'}
@@ -57,6 +58,7 @@ export function AuthenticatedLayout(): JSX.Element {
                   type="button"
                   onClick={handleLogout}
                   className="block w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-100"
+                  data-cy="header-logout-button"
                 >
                   Sair
                 </button>
