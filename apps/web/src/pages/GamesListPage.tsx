@@ -95,7 +95,7 @@ export function GamesListPage(): JSX.Element {
       {isLoading ? (
         <div data-cy="games-list-loading" className="text-slate-500">Carregando jogos...</div>
       ) : isError ? (
-        <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">Erro ao carregar jogos.</div>
+        <div data-cy="games-list-error" className="rounded-md bg-red-50 p-4 text-sm text-red-700">Erro ao carregar jogos.</div>
       ) : !games || games.length === 0 ? (
         <div data-cy="games-list-empty" className="card text-center text-sm text-slate-500">
           Nenhum jogo encontrado com estes filtros.
