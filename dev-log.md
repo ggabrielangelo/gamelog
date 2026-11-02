@@ -73,6 +73,19 @@ equilíbrio econômico da automação).
   - Execução inicial da suíte: 25/32 testes aprovados (ver
     RELATORIO_BLOCO_4B.md para detalhamento das 7 falhas).
 
+### 2026-11-02 — Bloco 4 · Fix de testes (correção das 4 falhas do RELATORIO)
+- Início: 01:11
+- Fim: 01:13
+- Duração: 0h 02min
+- Atividades:
+  - 4 fixes aplicados em commits isolados sobre as suítes Cypress:
+    - F1 `fix(e2e): use localStorage.getItem for token key with dot (CT01, CT04, CT07)` — `0473aac`.
+    - F2 `fix(e2e): add passwordConfirmation to secondary user register (CT15, CT29)` — `cf10e47`.
+    - F3 `fix(e2e): bypass HTML5 clamp to test Zod rating validation (CT23)` — `7e24968`.
+    - F4 `fix(e2e): avoid DOM detachment by materializing cards (CT28)` — `5cfd907`.
+  - Execução ficou pendente do terminal nativo do Gabriel (bug
+    `ELECTRON_RUN_AS_NODE` impede rodar Cypress a partir do Claude Code).
+
 ---
 
 ## Consolidado (preencher ao final)
