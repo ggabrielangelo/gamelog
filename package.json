@@ -17,7 +17,8 @@
     "test:e2e:10x": "npm run test:10x --workspace e2e",
     "seed": "npm run seed --workspace apps/api",
     "prisma:migrate": "npm run migrate --workspace apps/api",
-    "prisma:reset": "npm run reset --workspace apps/api"
+    "prisma:reset": "npm run reset --workspace apps/api",
+    "prisma:reset-test": "npm run reset:test --workspace apps/api"
   },
   "engines": {
     "node": ">=20"
