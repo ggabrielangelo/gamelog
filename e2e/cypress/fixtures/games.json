@@ -1,0 +1,24 @@
+{
+  "basic": {
+    "title": "Teste CT08",
+    "platform": "PC",
+    "genre": "RPG",
+    "status": "BACKLOG",
+    "coverUrl": "https://example.com/cover.jpg",
+    "notes": "Jogo criado pelo CT08."
+  },
+  "minimal": {
+    "title": "Mínimo CT09",
+    "platform": "Switch",
+    "status": "BACKLOG"
+  },
+  "edit": {
+    "title": "Editado CT13",
+    "platform": "PS5"
+  },
+  "secondaryUserGame": {
+    "title": "Jogo do outro usuário",
+    "platform": "Xbox",
+    "status": "BACKLOG"
+  }
+}

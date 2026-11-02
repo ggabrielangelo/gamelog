@@ -1,0 +1,17 @@
+{
+  "primary": {
+    "name": "Usuário de Teste",
+    "email": "teste@gamelog.com",
+    "password": "Senha123"
+  },
+  "secondary": {
+    "name": "Outro Jogador",
+    "email": "outro@gamelog.com",
+    "password": "Senha456"
+  },
+  "newUser": {
+    "name": "Novo Usuário",
+    "email": "novo@gamelog.com",
+    "password": "NovaSenha123"
+  }
+}
