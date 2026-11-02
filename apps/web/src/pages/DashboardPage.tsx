@@ -44,18 +44,30 @@ export function DashboardPage(): JSX.Element {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <StatCard label="Total" value={stats.totalGames} />
-        <StatCard label={statusLabel('BACKLOG')} value={stats.backlog} />
-        <StatCard label={statusLabel('PLAYING')} value={stats.playing} />
-        <StatCard label={statusLabel('COMPLETED')} value={stats.completed} />
-        <StatCard label={statusLabel('ABANDONED')} value={stats.abandoned} />
-        <StatCard label="Horas" value={stats.totalHours.toFixed(1)} />
+        <div data-cy="dashboard-stat-total-games">
+          <StatCard label="Total" value={stats.totalGames} />
+        </div>
+        <div data-cy="dashboard-stat-backlog">
+          <StatCard label={statusLabel('BACKLOG')} value={stats.backlog} />
+        </div>
+        <div data-cy="dashboard-stat-playing">
+          <StatCard label={statusLabel('PLAYING')} value={stats.playing} />
+        </div>
+        <div data-cy="dashboard-stat-completed">
+          <StatCard label={statusLabel('COMPLETED')} value={stats.completed} />
+        </div>
+        <div data-cy="dashboard-stat-abandoned">
+          <StatCard label={statusLabel('ABANDONED')} value={stats.abandoned} />
+        </div>
+        <div data-cy="dashboard-stat-total-hours">
+          <StatCard label="Horas" value={stats.totalHours.toFixed(1)} />
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="card">
           <h2 className="text-sm font-semibold text-slate-900">Avaliação média</h2>
-          <p className="mt-2 text-4xl font-bold text-brand-700">
+          <p className="mt-2 text-4xl font-bold text-brand-700" data-cy="dashboard-stat-avg-rating">
             {stats.avgRating === null ? '—' : stats.avgRating.toFixed(1)}
           </p>
           <p className="mt-1 text-xs text-slate-500">
@@ -63,7 +75,7 @@ export function DashboardPage(): JSX.Element {
           </p>
         </section>
 
-        <section className="card">
+        <section className="card" data-cy="dashboard-top-rated">
           <h2 className="text-sm font-semibold text-slate-900">Melhores avaliados</h2>
           {topRatedQuery.isLoading ? (
             <p className="mt-2 text-sm text-slate-500">Carregando...</p>
