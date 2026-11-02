@@ -5,6 +5,7 @@ describe('Games CRUD (CT08-CT17)', () => {
   let secondary: { name: string; email: string; password: string };
   let gameBasic: Record<string, unknown>;
   let gameMinimal: Record<string, unknown>;
+  let token: string;
 
   before(() => {
     cy.fixture('users').then((u) => {
@@ -19,7 +20,12 @@ describe('Games CRUD (CT08-CT17)', () => {
 
   beforeEach(() => {
     cy.resetDatabase();
-    cy.login(primary.email, primary.password);
+    cy.loginApi(primary.email, primary.password).then((t) => {
+      token = t;
+      cy.window().then((win) => {
+        win.localStorage.setItem('gamelog.token', t);
+      });
+    });
   });
 
   it('CT08 — cadastra jogo completo via UI', () => {
@@ -54,13 +60,11 @@ describe('Games CRUD (CT08-CT17)', () => {
   });
 
   it('CT11 — rejeita plataforma fora da lista fechada via API', () => {
-    cy.login(primary.email, primary.password).then((token) => {
-      cy.apiRequest('POST', '/games', {
-        token,
-        body: { title: 'Teste CT11', platform: 'PlayStation6' },
-      }).then((res) => {
-        expect(res.status).to.eq(400);
-      });
+    cy.apiRequest('POST', '/games', {
+      token,
+      body: { title: 'Teste CT11', platform: 'PlayStation6' },
+    }).then((res) => {
+      expect(res.status).to.eq(400);
     });
   });
 
@@ -75,92 +79,71 @@ describe('Games CRUD (CT08-CT17)', () => {
   });
 
   it('CT13 — edita título e plataforma de um jogo próprio', () => {
-    cy.visit('/games');
-    cy.get('[data-cy="game-card-title"]').first().click();
-    cy.get('[data-cy="game-detail-edit-button"]').click();
+    cy.createGame(token, { title: 'CT13 Original', platform: 'PC', status: 'BACKLOG' }).then(
+      (game) => {
+        cy.visit(`/games/${game.id}/edit`);
+        cy.get('[data-cy="game-form-title-input"]').clear().type('Editado CT13');
+        cy.get('[data-cy="game-form-platform-select"]').select('PS5');
+        cy.get('[data-cy="game-form-submit-button"]').click();
 
-    cy.get('[data-cy="game-form-title-input"]').clear().type('Editado CT13');
-    cy.get('[data-cy="game-form-platform-select"]').select('PS5');
-    cy.get('[data-cy="game-form-submit-button"]').click();
-
-    cy.get('[data-cy="game-detail-title"]', { timeout: 10000 }).should('contain', 'Editado CT13');
+        cy.get('[data-cy="game-detail-title"]', { timeout: 10000 }).should(
+          'contain',
+          'Editado CT13',
+        );
+      },
+    );
   });
 
   it('CT14 — rejeita edição com título vazio', () => {
-    cy.visit('/games');
-    cy.get('[data-cy="game-card-title"]').first().click();
-    cy.get('[data-cy="game-detail-edit-button"]').click();
-    cy.get('[data-cy="game-form-title-input"]').clear();
-    cy.get('[data-cy="game-form-submit-button"]').click();
+    cy.createGame(token, { title: 'CT14 Original', platform: 'PC' }).then((game) => {
+      cy.visit(`/games/${game.id}/edit`);
+      cy.get('[data-cy="game-form-title-input"]').clear();
+      cy.get('[data-cy="game-form-submit-button"]').click();
 
-    cy.get('[data-cy="game-form"]').should('be.visible');
+      cy.get('[data-cy="game-form"]').should('be.visible');
+    });
   });
 
   it('CT15 — rejeita edição de jogo de outro usuário via API (403)', () => {
-    cy.apiRequest('POST', '/auth/register', {
-      body: {
-        name: secondary.name,
-        email: secondary.email,
-        password: secondary.password,
-        passwordConfirmation: secondary.password,
-      },
-    }).then((regRes) => {
-      expect([200, 201]).to.include(regRes.status);
-      const tokenB = (regRes.body?.token ?? regRes.body?.data?.token) as string;
-
-      cy.apiRequest('POST', '/games', {
-        token: tokenB,
-        body: { title: 'Jogo do B', platform: 'PC' },
-      }).then((createRes) => {
-        expect([200, 201]).to.include(createRes.status);
-        const gameId = createRes.body?.game?.id ?? createRes.body?.id;
-
-        cy.login(primary.email, primary.password).then((tokenA) => {
-          cy.apiRequest('PATCH', `/games/${gameId}`, {
-            token: tokenA,
-            body: { title: 'Invasão' },
-          }).then((res) => {
-            expect(res.status).to.be.oneOf([403, 404]);
-          });
+    cy.registerUser(secondary).then(({ token: tokenB }) => {
+      cy.createGame(tokenB, { title: 'Jogo do B', platform: 'PC' }).then((gameB) => {
+        cy.apiRequest('PATCH', `/games/${gameB.id}`, {
+          token,
+          body: { title: 'Invasão' },
+        }).then((res) => {
+          expect(res.status).to.be.oneOf([403, 404]);
         });
       });
     });
   });
 
   it('CT16 — remove jogo com confirmação explícita (modal)', () => {
-    cy.visit('/games');
-    cy.get('[data-cy="game-card-title"]').first().click();
-    cy.get('[data-cy="game-detail-title"]').invoke('text').then((titleText) => {
+    cy.createGame(token, { title: 'CT16 Para Excluir', platform: 'PC' }).then((game) => {
+      cy.visit(`/games/${game.id}`);
       cy.get('[data-cy="game-detail-delete-button"]').click();
       cy.get('[data-cy="game-detail-delete-confirm"]').should('be.visible').click();
 
       cy.location('pathname', { timeout: 10000 }).should('eq', '/games');
-      cy.contains(titleText.trim()).should('not.exist');
+
+      cy.apiRequest('GET', `/games/${game.id}`, { token }).then((res) => {
+        expect(res.status).to.eq(404);
+      });
     });
   });
 
   it('CT17 — remoção faz cascata nas sessões (verificação via API)', () => {
-    cy.login(primary.email, primary.password).then((token) => {
-      cy.apiRequest('POST', '/games', {
-        token,
-        body: { title: 'CT17 Cascata', platform: 'PC', status: 'PLAYING' },
-      }).then((cRes) => {
-        const gameId = cRes.body?.game?.id ?? cRes.body?.id;
-        cy.apiRequest('POST', `/games/${gameId}/sessions`, {
-          token,
-          body: { hours: 2 },
-        }).then((sRes) => {
-          expect([200, 201]).to.include(sRes.status);
-
-          cy.apiRequest('DELETE', `/games/${gameId}`, { token }).then((dRes) => {
+    cy.createGame(token, { title: 'CT17 Cascata', platform: 'PC', status: 'PLAYING' }).then(
+      (game) => {
+        cy.createSession(token, game.id, { hours: 2 }).then(() => {
+          cy.apiRequest('DELETE', `/games/${game.id}`, { token }).then((dRes) => {
             expect([200, 204]).to.include(dRes.status);
 
-            cy.apiRequest('GET', `/games/${gameId}/sessions`, { token }).then((lRes) => {
+            cy.apiRequest('GET', `/games/${game.id}/sessions`, { token }).then((lRes) => {
               expect(lRes.status).to.eq(404);
             });
           });
         });
-      });
-    });
+      },
+    );
   });
 });
