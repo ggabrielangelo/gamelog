@@ -125,6 +125,11 @@ Cypress.Commands.add('loginApi', (email: string, password: string) => {
 
 Cypress.Commands.add('login', (email: string, password: string) => {
   return cy.loginApi(email, password).then((token) => {
+    // Garantir que o localStorage seja gravado na origem correta do app
+    // (http://localhost:5173), não no about:blank onde um cy.window() direto
+    // antes de qualquer cy.visit resolveria. Visitamos /login primeiro porque
+    // é a rota pública mais barata (não bate em /users/me do AuthContext).
+    cy.visit('/login');
     cy.window().then((win) => {
       win.localStorage.setItem(TOKEN_STORAGE_KEY, token);
     });

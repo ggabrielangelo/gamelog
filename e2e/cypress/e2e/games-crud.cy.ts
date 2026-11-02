@@ -20,11 +20,8 @@ describe('Games CRUD (CT08-CT17)', () => {
 
   beforeEach(() => {
     cy.resetDatabase();
-    cy.loginApi(primary.email, primary.password).then((t) => {
+    cy.login(primary.email, primary.password).then((t) => {
       token = t;
-      cy.window().then((win) => {
-        win.localStorage.setItem('gamelog.token', t);
-      });
     });
   });
 
