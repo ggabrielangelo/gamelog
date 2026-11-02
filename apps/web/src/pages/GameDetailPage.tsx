@@ -96,12 +96,14 @@ export function GameDetailPage(): JSX.Element {
   const hoursTotal = game.hoursTotal ?? 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-cy="game-detail">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold text-slate-900">{game.title}</h1>
-            <StatusBadge status={game.status} />
+            <h1 className="text-2xl font-semibold text-slate-900" data-cy="game-detail-title">{game.title}</h1>
+            <span data-cy="game-detail-status-badge">
+              <StatusBadge status={game.status} />
+            </span>
           </div>
           <div className="mt-1 text-sm text-slate-500">
             {game.platform}
@@ -109,10 +111,15 @@ export function GameDetailPage(): JSX.Element {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Link to={`/games/${game.id}/edit`} className="btn-secondary">
+          <Link to={`/games/${game.id}/edit`} className="btn-secondary" data-cy="game-detail-edit-button">
             Editar
           </Link>
-          <button type="button" className="btn-danger" onClick={() => setConfirmingDelete(true)}>
+          <button
+            type="button"
+            className="btn-danger"
+            onClick={() => setConfirmingDelete(true)}
+            data-cy="game-detail-delete-button"
+          >
             Excluir
           </button>
         </div>
@@ -121,7 +128,7 @@ export function GameDetailPage(): JSX.Element {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="card">
           <div className="text-xs uppercase tracking-wide text-slate-500">Avaliação</div>
-          <div className="mt-1 text-2xl font-semibold text-slate-900">
+          <div className="mt-1 text-2xl font-semibold text-slate-900" data-cy="game-detail-rating">
             {game.rating === null ? '—' : `${game.rating}/10`}
           </div>
           {game.status === 'COMPLETED' && (
@@ -129,6 +136,7 @@ export function GameDetailPage(): JSX.Element {
               type="button"
               className="mt-2 text-xs font-medium text-brand-700 hover:underline"
               onClick={() => setShowRateForm((v) => !v)}
+              data-cy="game-detail-rate-button"
             >
               {game.rating === null ? 'Avaliar' : 'Alterar avaliação'}
             </button>
@@ -136,7 +144,7 @@ export function GameDetailPage(): JSX.Element {
         </div>
         <div className="card">
           <div className="text-xs uppercase tracking-wide text-slate-500">Horas jogadas</div>
-          <div className="mt-1 text-2xl font-semibold text-slate-900">{hoursTotal.toFixed(1)}</div>
+          <div className="mt-1 text-2xl font-semibold text-slate-900" data-cy="game-detail-hours-total">{hoursTotal.toFixed(1)}</div>
         </div>
         <div className="card">
           <div className="text-xs uppercase tracking-wide text-slate-500">Concluído em</div>
@@ -192,6 +200,7 @@ export function GameDetailPage(): JSX.Element {
           <form
             onSubmit={sessionForm.handleSubmit((v) => addSessionMutation.mutate(v))}
             className="mt-3 flex flex-wrap items-end gap-3"
+            data-cy="session-form"
           >
             <div>
               <label className="label" htmlFor="hours">
@@ -204,6 +213,7 @@ export function GameDetailPage(): JSX.Element {
                 min="0.25"
                 max="24"
                 className="input w-32"
+                data-cy="session-hours-input"
                 {...sessionForm.register('hours', { valueAsNumber: true })}
               />
               {sessionForm.formState.errors.hours && (
@@ -216,6 +226,7 @@ export function GameDetailPage(): JSX.Element {
               type="submit"
               className="btn-primary"
               disabled={addSessionMutation.isPending}
+              data-cy="session-submit-button"
             >
               {addSessionMutation.isPending ? 'Registrando...' : 'Registrar sessão'}
             </button>
@@ -232,9 +243,9 @@ export function GameDetailPage(): JSX.Element {
           ) : sessions.length === 0 ? (
             <p className="text-sm text-slate-500">Nenhuma sessão registrada ainda.</p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-slate-100" data-cy="sessions-list">
               {sessions.map((s) => (
-                <li key={s.id} className="flex items-center justify-between py-2 text-sm">
+                <li key={s.id} className="flex items-center justify-between py-2 text-sm" data-cy="session-item">
                   <span className="text-slate-700">
                     {new Date(s.playedAt).toLocaleString('pt-BR')}
                   </span>
@@ -263,6 +274,7 @@ export function GameDetailPage(): JSX.Element {
                 type="button"
                 className="btn-secondary"
                 onClick={() => setConfirmingDelete(false)}
+                data-cy="game-detail-delete-cancel"
               >
                 Cancelar
               </button>
@@ -271,6 +283,7 @@ export function GameDetailPage(): JSX.Element {
                 className="btn-danger"
                 onClick={() => deleteMutation.mutate()}
                 disabled={deleteMutation.isPending}
+                data-cy="game-detail-delete-confirm"
               >
                 {deleteMutation.isPending ? 'Excluindo...' : 'Excluir'}
               </button>
