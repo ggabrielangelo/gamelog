@@ -32,9 +32,13 @@ describe('Autenticação (CT01-CT05, CT07)', () => {
   });
 
   it('CT02 — rejeita cadastro com e-mail duplicado', () => {
+    // Isolamento: o seed mínimo não cria o `newUser`. Garantimos o conflito
+    // pré-registrando-o via API antes de tentar duplicar pela UI.
+    cy.registerUser(newUser);
+
     cy.visit('/register');
     cy.get('[data-cy="register-name-input"]').type('Qualquer Nome');
-    cy.get('[data-cy="register-email-input"]').type(primary.email);
+    cy.get('[data-cy="register-email-input"]').type(newUser.email);
     cy.get('[data-cy="register-password-input"]').type('OutraSenha123');
     cy.get('[data-cy="register-password-confirm-input"]').type('OutraSenha123');
     cy.get('[data-cy="register-submit-button"]').click();
@@ -58,6 +62,7 @@ describe('Autenticação (CT01-CT05, CT07)', () => {
   });
 
   it('CT04 — autentica usuário válido e recebe JWT', () => {
+    // Usuário primário já vem no seed mínimo.
     cy.visit('/login');
     cy.get('[data-cy="login-email-input"]').type(primary.email);
     cy.get('[data-cy="login-password-input"]').type(primary.password);
