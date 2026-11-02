@@ -108,12 +108,12 @@ export function GameFormPage(): JSX.Element {
         {isEdit ? 'Editar jogo' : 'Adicionar jogo'}
       </h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 card space-y-4" noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 card space-y-4" noValidate data-cy="game-form">
         <div>
           <label className="label" htmlFor="title">
             Título
           </label>
-          <input id="title" className="input" {...register('title')} />
+          <input id="title" className="input" data-cy="game-form-title-input" {...register('title')} />
           {errors.title && <p className="mt-1 text-xs text-red-600">{errors.title.message}</p>}
         </div>
 
@@ -122,7 +122,7 @@ export function GameFormPage(): JSX.Element {
             <label className="label" htmlFor="platform">
               Plataforma
             </label>
-            <select id="platform" className="input" {...register('platform')}>
+            <select id="platform" className="input" data-cy="game-form-platform-select" {...register('platform')}>
               {GAME_PLATFORMS.map((p) => (
                 <option key={p} value={p}>
                   {p}
@@ -137,7 +137,7 @@ export function GameFormPage(): JSX.Element {
             <label className="label" htmlFor="status">
               Status
             </label>
-            <select id="status" className="input" {...register('status')}>
+            <select id="status" className="input" data-cy="game-form-status-select" {...register('status')}>
               {GAME_STATUSES.map((s) => (
                 <option key={s} value={s}>
                   {statusLabel(s)}
@@ -151,14 +151,14 @@ export function GameFormPage(): JSX.Element {
           <label className="label" htmlFor="genre">
             Gênero (opcional)
           </label>
-          <input id="genre" className="input" placeholder="Ex.: RPG, Indie..." {...register('genre')} />
+          <input id="genre" className="input" placeholder="Ex.: RPG, Indie..." data-cy="game-form-genre-input" {...register('genre')} />
         </div>
 
         <div>
           <label className="label" htmlFor="coverUrl">
             URL da capa (opcional)
           </label>
-          <input id="coverUrl" className="input" placeholder="https://..." {...register('coverUrl')} />
+          <input id="coverUrl" className="input" placeholder="https://..." data-cy="game-form-cover-input" {...register('coverUrl')} />
           {errors.coverUrl && (
             <p className="mt-1 text-xs text-red-600">{errors.coverUrl.message}</p>
           )}
@@ -168,18 +168,18 @@ export function GameFormPage(): JSX.Element {
           <label className="label" htmlFor="notes">
             Notas (opcional)
           </label>
-          <textarea id="notes" rows={4} className="input" {...register('notes')} />
+          <textarea id="notes" rows={4} className="input" data-cy="game-form-notes-input" {...register('notes')} />
         </div>
 
         {serverError && (
-          <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{serverError}</div>
+          <div data-cy="game-form-error-message" className="rounded-md bg-red-50 p-3 text-sm text-red-700">{serverError}</div>
         )}
 
         <div className="flex items-center justify-end gap-3">
-          <button type="button" onClick={() => navigate(-1)} className="btn-secondary">
+          <button type="button" onClick={() => navigate(-1)} className="btn-secondary" data-cy="game-form-cancel-button">
             Cancelar
           </button>
-          <button type="submit" className="btn-primary" disabled={isSubmitting || mutation.isPending}>
+          <button type="submit" className="btn-primary" disabled={isSubmitting || mutation.isPending} data-cy="game-form-submit-button">
             {isSubmitting || mutation.isPending ? 'Salvando...' : 'Salvar'}
           </button>
         </div>
