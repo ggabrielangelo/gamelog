@@ -1,0 +1,25 @@
+{
+  "name": "gamelog",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GameLog — aplicação de backlog de jogos usada como objeto de estudo empírico do TCC de comparação entre abordagens de teste manual e automatizado.",
+  "workspaces": [
+    "apps/*",
+    "e2e"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:api": "npm run dev --workspace apps/api",
+    "build": "npm run build --workspaces --if-present",
+    "test:e2e": "npm run test --workspace e2e",
+    "test:e2e:open": "npm run open --workspace e2e",
+    "test:e2e:10x": "npm run test:10x --workspace e2e",
+    "seed": "npm run seed --workspace apps/api",
+    "prisma:migrate": "npm run migrate --workspace apps/api",
+    "prisma:reset": "npm run reset --workspace apps/api"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

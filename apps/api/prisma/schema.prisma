@@ -1,0 +1,54 @@
+// GameLog — schema Prisma (SQLite local).
+// Fonte de verdade do modelo de dados: Seção 4 do CLAUDE.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  games        Game[]
+  sessions     PlaySession[]
+}
+
+model Game {
+  id         String        @id @default(uuid())
+  userId     String
+  title      String
+  platform   String
+  genre      String?
+  status     String        @default("BACKLOG")
+  rating     Int?
+  coverUrl   String?
+  notes      String?
+  addedAt    DateTime      @default(now())
+  finishedAt DateTime?
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions PlaySession[]
+
+  @@index([userId])
+}
+
+model PlaySession {
+  id       String   @id @default(uuid())
+  userId   String
+  gameId   String
+  hours    Float
+  playedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([gameId])
+}

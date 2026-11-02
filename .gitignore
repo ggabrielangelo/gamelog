@@ -1,0 +1,49 @@
+# Dependências
+node_modules/
+.npm/
+.pnp.*
+
+# Build / dist
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Banco de dados (Prisma / SQLite)
+apps/api/prisma/dev.db
+apps/api/prisma/dev.db-journal
+apps/api/prisma/migrations/dev/
+
+# Cobertura
+coverage/
+.nyc_output/
+
+# Cypress
+e2e/cypress/videos/
+e2e/cypress/screenshots/
+e2e/cypress/downloads/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editores / SO
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.recommended.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+tmp/
