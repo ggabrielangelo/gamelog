@@ -57,7 +57,13 @@ export function RegisterPage(): JSX.Element {
             <label className="label" htmlFor="name">
               Nome
             </label>
-            <input id="name" className="input" autoComplete="name" {...register('name')} />
+            <input
+              id="name"
+              className="input"
+              autoComplete="name"
+              data-cy="register-name-input"
+              {...register('name')}
+            />
             {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>}
           </div>
 
@@ -65,7 +71,14 @@ export function RegisterPage(): JSX.Element {
             <label className="label" htmlFor="email">
               E-mail
             </label>
-            <input id="email" type="email" className="input" autoComplete="email" {...register('email')} />
+            <input
+              id="email"
+              type="email"
+              className="input"
+              autoComplete="email"
+              data-cy="register-email-input"
+              {...register('email')}
+            />
             {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
           </div>
 
@@ -78,6 +91,7 @@ export function RegisterPage(): JSX.Element {
               type="password"
               className="input"
               autoComplete="new-password"
+              data-cy="register-password-input"
               {...register('password')}
             />
             {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
@@ -93,6 +107,7 @@ export function RegisterPage(): JSX.Element {
               type="password"
               className="input"
               autoComplete="new-password"
+              data-cy="register-password-confirm-input"
               {...register('passwordConfirmation')}
             />
             {errors.passwordConfirmation && (
@@ -101,10 +116,20 @@ export function RegisterPage(): JSX.Element {
           </div>
 
           {serverError && (
-            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">{serverError}</div>
+            <div
+              data-cy="register-error-message"
+              className="rounded-md bg-red-50 p-3 text-sm text-red-700"
+            >
+              {serverError}
+            </div>
           )}
 
-          <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
+          <button
+            type="submit"
+            className="btn-primary w-full"
+            disabled={isSubmitting}
+            data-cy="register-submit-button"
+          >
             {isSubmitting ? 'Cadastrando...' : 'Criar conta'}
           </button>
         </form>
