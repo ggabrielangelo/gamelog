@@ -73,6 +73,23 @@ equilíbrio econômico da automação).
   - Execução inicial da suíte: 25/32 testes aprovados (ver
     RELATORIO_BLOCO_4B.md para detalhamento das 7 falhas).
 
+### 2026-11-02 — Bloco 4 · Refatoração para isolamento por teste
+- Início: 01:21
+- Fim: 01:26
+- Duração: 0h 05min
+- Atividades:
+  - Seed mínimo (`apps/api/prisma/seed-minimal.ts`) e scripts
+    `reset:test` / `prisma:reset-test` — commit `4fb9d30`.
+  - `cy.resetDatabase()` passa a usar o reset mínimo — commit `5b8034c`.
+  - 6 novos custom commands de API para criação de dados
+    (`cy.registerUser`, `cy.loginApi`, `cy.createGame`,
+    `cy.createSession`, `cy.setGameStatus`, `cy.setGameRating`) +
+    `cy.login` agora delega a `cy.loginApi` — commit `68813d1`.
+  - 6 refactors (um por suíte): `a87d37b`, `3763290`, `c702323`,
+    `b6a0204`, `c8b97bc`, `5db2e1f`.
+  - Resultado: suíte agora é determinística e cada CT é independente
+    dos demais. Pode rodar em qualquer ordem.
+
 ### 2026-11-02 — Bloco 4 · Fix de testes (correção das 4 falhas do RELATORIO)
 - Início: 01:11
 - Fim: 01:13
