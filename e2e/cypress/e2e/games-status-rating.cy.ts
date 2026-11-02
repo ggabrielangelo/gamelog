@@ -94,7 +94,10 @@ describe('Games status & rating (CT18-CT23)', () => {
       createGame(token, { title: 'CT23', platform: 'PC', status: 'COMPLETED' }).then((id) => {
         cy.visit(`/games/${id}`);
         cy.get('[data-cy="game-detail-rate-button"]').click();
-        cy.get('[data-cy="game-detail-rate-input"]').clear().type('11');
+        cy.get('[data-cy="game-detail-rate-input"]')
+          .invoke('removeAttr', 'max')
+          .clear()
+          .type('11');
         cy.get('[data-cy="game-detail-rate-submit"]').click();
         cy.get('[data-cy="game-detail-rate-error"]').should('be.visible');
 
