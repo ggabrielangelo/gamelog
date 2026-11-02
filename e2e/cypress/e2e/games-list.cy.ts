@@ -53,17 +53,14 @@ describe('Lista e filtros (CT27-CT29)', () => {
       cy.get('[data-cy="games-filter-platform"]').select('Switch');
       cy.get('[data-cy="games-list"]').should('be.visible');
 
-      cy.get('[data-cy="game-card"]', { timeout: 10000 }).then(($cards) => {
-        expect($cards.length, 'exatamente 1 card após filtro Switch+BACKLOG').to.eq(1);
-        const row = {
-          title: Cypress.$($cards[0]).find('[data-cy="game-card-title"]').text().trim(),
-          platform: Cypress.$($cards[0]).find('[data-cy="game-card-platform"]').text().trim(),
-          status: Cypress.$($cards[0]).find('[data-cy="game-card-status"]').text().trim(),
-        };
-        expect(row.title).to.eq('CT28 Match');
-        expect(row.platform).to.contain('Switch');
-        expect(row.status).to.contain('A jogar');
-      });
+      cy.get('[data-cy="game-card"]').should('have.length', 1);
+      cy.get('[data-cy="game-card"]')
+        .first()
+        .within(() => {
+          cy.get('[data-cy="game-card-title"]').should('contain', 'CT28 Match');
+          cy.get('[data-cy="game-card-platform"]').should('contain', 'Switch');
+          cy.get('[data-cy="game-card-status"]').should('contain', 'A jogar');
+        });
     });
   });
 
