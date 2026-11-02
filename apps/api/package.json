@@ -11,7 +11,7 @@
     "seed": "tsx prisma/seed.ts",
     "migrate": "prisma migrate dev",
     "reset": "prisma migrate reset --force",
-    "reset:test": "prisma migrate reset --force --skip-seed && tsx prisma/seed-minimal.ts"
+    "reset:test": "prisma migrate reset --force --skip-seed --skip-generate && tsx prisma/seed-minimal.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
