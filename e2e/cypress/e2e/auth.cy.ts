@@ -26,7 +26,9 @@ describe('Autenticação (CT01-CT05, CT07)', () => {
     cy.get('[data-cy="register-submit-button"]').click();
 
     cy.location('pathname', { timeout: 10000 }).should('not.eq', '/register');
-    cy.window().its(`localStorage.${TOKEN_STORAGE_KEY}`).should('exist');
+    cy.window().then((win) => {
+      expect(win.localStorage.getItem(TOKEN_STORAGE_KEY)).to.be.a('string');
+    });
   });
 
   it('CT02 — rejeita cadastro com e-mail duplicado', () => {
@@ -50,7 +52,9 @@ describe('Autenticação (CT01-CT05, CT07)', () => {
     cy.get('[data-cy="register-submit-button"]').click();
 
     cy.location('pathname').should('eq', '/register');
-    cy.window().its(`localStorage.${TOKEN_STORAGE_KEY}`).should('not.exist');
+    cy.window().then((win) => {
+      expect(win.localStorage.getItem(TOKEN_STORAGE_KEY)).to.be.null;
+    });
   });
 
   it('CT04 — autentica usuário válido e recebe JWT', () => {
@@ -60,7 +64,11 @@ describe('Autenticação (CT01-CT05, CT07)', () => {
     cy.get('[data-cy="login-submit-button"]').click();
 
     cy.location('pathname', { timeout: 10000 }).should('not.eq', '/login');
-    cy.window().its(`localStorage.${TOKEN_STORAGE_KEY}`).should('be.a', 'string').and('have.length.greaterThan', 20);
+    cy.window().then((win) => {
+      const token = win.localStorage.getItem(TOKEN_STORAGE_KEY);
+      expect(token).to.be.a('string');
+      expect(token!.length).to.be.greaterThan(20);
+    });
   });
 
   it('CT05 — rejeita login com senha incorreta', () => {
@@ -71,18 +79,24 @@ describe('Autenticação (CT01-CT05, CT07)', () => {
 
     cy.get('[data-cy="login-error-message"]').should('be.visible');
     cy.location('pathname').should('eq', '/login');
-    cy.window().its(`localStorage.${TOKEN_STORAGE_KEY}`).should('not.exist');
+    cy.window().then((win) => {
+      expect(win.localStorage.getItem(TOKEN_STORAGE_KEY)).to.be.null;
+    });
   });
 
   it('CT07 — encerra sessão limpando JWT do localStorage', () => {
     cy.login(primary.email, primary.password);
     cy.visit('/');
-    cy.window().its(`localStorage.${TOKEN_STORAGE_KEY}`).should('exist');
+    cy.window().then((win) => {
+      expect(win.localStorage.getItem(TOKEN_STORAGE_KEY)).to.be.a('string');
+    });
 
     cy.get('[data-cy="header-user-menu"]').click();
     cy.get('[data-cy="header-logout-button"]').click();
 
     cy.location('pathname', { timeout: 10000 }).should('eq', '/login');
-    cy.window().its(`localStorage.${TOKEN_STORAGE_KEY}`).should('not.exist');
+    cy.window().then((win) => {
+      expect(win.localStorage.getItem(TOKEN_STORAGE_KEY)).to.be.null;
+    });
   });
 });
