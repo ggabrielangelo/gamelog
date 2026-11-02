@@ -1,0 +1,19 @@
+{
+  "name": "e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Suíte Cypress E2E do GameLog (Bloco 4b do TCC).",
+  "scripts": {
+    "test": "cypress run",
+    "open": "cypress open",
+    "test:10x": "node scripts/run-10x.mjs"
+  },
+  "devDependencies": {
+    "@cypress/code-coverage": "^3.12.39",
+    "@types/node": "^20.11.0",
+    "cypress": "^13.15.0",
+    "istanbul-lib-coverage": "^3.2.2",
+    "nyc": "^15.1.0",
+    "typescript": "^5.3.3"
+  }
+}
