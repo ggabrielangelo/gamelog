@@ -1,12 +1,19 @@
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\//, '')), '..', '..');
-const E2E_DIR = path.resolve(REPO_ROOT, 'e2e');
+// Usa fileURLToPath pra decodificar URL escapes (ex.: %20 em "GAMELOG") e
+// normalizar separadores. Essencial em paths do Windows com espaços.
+const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const E2E_DIR = path.resolve(SCRIPT_DIR, '..');
+const REPO_ROOT = path.resolve(E2E_DIR, '..');
 const RUNS = 10;
 
 function run(cmd, args, cwd) {
   const r = spawnSync(cmd, args, { cwd, stdio: 'inherit', shell: true });
+  if (r.error) {
+    console.error(`[run-10x] spawn error (${cmd} ${args.join(' ')} em ${cwd}):`, r.error.message);
+  }
   return r.status ?? 1;
 }
 
@@ -15,7 +22,7 @@ const started = Date.now();
 
 for (let i = 1; i <= RUNS; i += 1) {
   console.log(`\n=== Rodada ${i}/${RUNS} ===`);
-  const resetCode = run('npm', ['run', 'prisma:reset'], REPO_ROOT);
+  const resetCode = run('npm', ['run', 'prisma:reset-test'], REPO_ROOT);
   if (resetCode !== 0) {
     results.push({ i, phase: 'reset', code: resetCode });
     continue;
