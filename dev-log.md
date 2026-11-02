@@ -60,6 +60,19 @@ equilíbrio econômico da automação).
     RegisterPage, AuthenticatedLayout, GamesListPage, GameFormPage,
     GameDetailPage, DashboardPage.
 
+### 2026-11-02 — Bloco 4b · Cypress config + .cy.ts suites
+- Início: 00:22
+- Fim: 00:48
+- Duração: 0h 26min
+- Atividades:
+  - Bootstrap do workspace `e2e/` com Cypress 14 (upgrade de 13 por
+    bug de smoke-test no Windows 11 build 26200) e `@cypress/code-coverage`.
+  - Custom commands `cy.login`, `cy.resetDatabase` e `cy.apiRequest`.
+  - Fixtures `users.json` e `games.json`.
+  - 6 suítes `.cy.ts` cobrindo os 30 CTs automatizáveis do Apêndice B.
+  - Execução inicial da suíte: 25/32 testes aprovados (ver
+    RELATORIO_BLOCO_4B.md para detalhamento das 7 falhas).
+
 ---
 
 ## Consolidado (preencher ao final)
