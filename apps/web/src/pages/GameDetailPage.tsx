@@ -158,6 +158,7 @@ export function GameDetailPage(): JSX.Element {
         <form
           onSubmit={ratingForm.handleSubmit((v) => rateMutation.mutate(v))}
           className="card flex flex-wrap items-end gap-3"
+          data-cy="game-detail-rate-form"
         >
           <div>
             <label className="label" htmlFor="rating">
@@ -169,15 +170,21 @@ export function GameDetailPage(): JSX.Element {
               min={1}
               max={10}
               className="input w-28"
+              data-cy="game-detail-rate-input"
               {...ratingForm.register('rating', { valueAsNumber: true })}
             />
             {ratingForm.formState.errors.rating && (
-              <p className="mt-1 text-xs text-red-600">
+              <p className="mt-1 text-xs text-red-600" data-cy="game-detail-rate-error">
                 {ratingForm.formState.errors.rating.message}
               </p>
             )}
           </div>
-          <button type="submit" className="btn-primary" disabled={rateMutation.isPending}>
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={rateMutation.isPending}
+            data-cy="game-detail-rate-submit"
+          >
             {rateMutation.isPending ? 'Salvando...' : 'Salvar avaliação'}
           </button>
           <button type="button" className="btn-secondary" onClick={() => setShowRateForm(false)}>
