@@ -28,18 +28,21 @@ describe('Lista e filtros (CT27-CT29)', () => {
     cy.visit('/games');
 
     cy.get('[data-cy="games-filter-status"]').select('BACKLOG');
+    cy.get('[data-cy="games-list"]').should('be.visible');
     cy.get('[data-cy="games-filter-platform"]').select('Switch');
+    cy.get('[data-cy="games-list"]').should('be.visible');
 
-    cy.get('[data-cy="games-list"]', { timeout: 10000 })
-      .find('[data-cy="game-card"]')
-      .each(($card) => {
-        cy.wrap($card)
-          .find('[data-cy="game-card-platform"]')
-          .should('contain', 'Switch');
-        cy.wrap($card)
-          .find('[data-cy="game-card-status"]')
-          .should('contain', 'A jogar');
+    cy.get('[data-cy="game-card"]', { timeout: 10000 }).then(($cards) => {
+      expect($cards.length, 'pelo menos um card após filtro combinado').to.be.gte(1);
+      const rows = Array.from($cards).map((card) => ({
+        platform: Cypress.$(card).find('[data-cy="game-card-platform"]').text().trim(),
+        status: Cypress.$(card).find('[data-cy="game-card-status"]').text().trim(),
+      }));
+      rows.forEach((row) => {
+        expect(row.platform, 'plataforma do card').to.contain('Switch');
+        expect(row.status, 'status do card').to.contain('A jogar');
       });
+    });
   });
 
   it('CT29 — isolamento entre usuários (jogos de outro user não aparecem)', () => {
