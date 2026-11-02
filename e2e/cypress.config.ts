@@ -24,7 +24,7 @@ export default defineConfig({
 
       on('task', {
         async resetDatabase() {
-          const { stdout, stderr } = await execAsync('npm run prisma:reset', {
+          const { stdout, stderr } = await execAsync('npm run prisma:reset-test', {
             cwd: REPO_ROOT,
             windowsHide: true,
           });
