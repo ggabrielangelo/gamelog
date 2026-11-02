@@ -53,10 +53,12 @@ equilíbrio econômico da automação).
 
 ### 2026-11-01 — Bloco 4a · Testability (sweep de `data-cy`)
 - Início: 23:42
-- Fim: _em andamento_
-- Duração: _em andamento_
+- Fim: 00:19 (2026-11-02)
+- Duração: 0h 37min
 - Atividades:
-  - Início do sweep de `data-cy` conforme Seção 5 do CLAUDE.md.
+  - Sweep concluído de 6 arquivos: LoginPage (consolidado em 914a9b8),
+    RegisterPage, AuthenticatedLayout, GamesListPage, GameFormPage,
+    GameDetailPage, DashboardPage.
 
 ---
 
