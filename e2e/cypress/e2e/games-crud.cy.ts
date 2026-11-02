@@ -102,6 +102,7 @@ describe('Games CRUD (CT08-CT17)', () => {
         name: secondary.name,
         email: secondary.email,
         password: secondary.password,
+        passwordConfirmation: secondary.password,
       },
     }).then((regRes) => {
       expect([200, 201]).to.include(regRes.status);
