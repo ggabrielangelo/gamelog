@@ -17,7 +17,7 @@ export function StatusBadge({ status }: { status: GameStatus }): JSX.Element {
         STATUS_STYLES[status],
       )}
     >
-      {statusLabel(status)}
+      {status}
     </span>
   );
 }

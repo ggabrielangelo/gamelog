@@ -199,3 +199,45 @@ todo, B01–B24).
   estando com status "Jogando".
 - **CT relacionado (Apêndice B):** CT19 (transição COMPLETED → outro
   status limpa `finishedAt`).
+
+---
+
+## B08 — Badge de status exibe enum cru em vez do rótulo em PT
+
+- **Severidade:** baixa
+- **Categoria:** interface (regra de i18n fixa Seção 4 do CLAUDE.md:
+  tabela de rótulos PT para `GameStatus`)
+- **Localização:** `apps/web/src/components/StatusBadge.tsx:20`
+  (texto renderizado dentro do `<span>` do badge)
+- **Diff aplicado:**
+  ```diff
+   export function StatusBadge({ status }: { status: GameStatus }): JSX.Element {
+     return (
+       <span
+         className={clsx(
+           'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset',
+           STATUS_STYLES[status],
+         )}
+       >
+  -      {statusLabel(status)}
+  +      {status}
+       </span>
+     );
+   }
+  ```
+  (A import de `statusLabel` é deixada intacta, embora não seja mais
+  usada — remover a import tornaria o bug detectável por linter
+  antes mesmo de o teste rodar.)
+- **Sintoma esperado:** todos os pontos da UI que usam `<StatusBadge />`
+  (cards da lista de jogos — `game-card-status`, detalhe do jogo —
+  `game-detail-status-badge`, bloco "Melhores avaliados" do
+  Dashboard) passam a mostrar os identificadores de enum em inglês
+  (`BACKLOG`, `PLAYING`, `COMPLETED`, `ABANDONED`) em vez dos
+  rótulos em PT (`A jogar`, `Jogando`, `Concluído`, `Abandonado`).
+  O estilo visual do badge (cores) permanece correto, porque
+  `STATUS_STYLES[status]` continua funcional. As legendas dos cards
+  do Dashboard (`statusLabel('BACKLOG')` etc. em `DashboardPage.tsx`)
+  **não** são afetadas — essas chamam `statusLabel` diretamente.
+- **CTs relacionados (Apêndice B):** CT24 (card da lista mostra
+  status em PT), CT20 (detalhe mostra badge de status em PT) e o
+  CT28 (filtro combinado + rótulo PT no card remanescente).
