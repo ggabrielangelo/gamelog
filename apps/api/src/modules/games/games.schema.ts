@@ -34,7 +34,7 @@ export const listGamesQuerySchema = z.object({
 export const createSessionSchema = z.object({
   hours: z
     .number({ invalid_type_error: 'Horas deve ser numérico' })
-    .positive('Horas deve ser maior que 0')
+    .gte(0, 'Horas deve ser maior ou igual a 0')
     .max(24, 'Horas deve ser no máximo 24'),
 });
 

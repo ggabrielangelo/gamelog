@@ -82,3 +82,28 @@ todo, B01–B24).
   isolado de validação de intervalo.
 - **CT relacionado (Apêndice B):** CT23 (rating fora do intervalo
   rejeitado).
+
+---
+
+## B04 — Validação de horas de sessão aceita zero
+
+- **Severidade:** baixa
+- **Categoria:** validação (regra de negócio Seção 7.10 do CLAUDE.md)
+- **Localização:** `apps/api/src/modules/games/games.schema.ts:36-40`
+  (schema `createSessionSchema`, campo `hours`)
+- **Diff aplicado:**
+  ```diff
+    hours: z
+      .number({ invalid_type_error: 'Horas deve ser numérico' })
+  -   .positive('Horas deve ser maior que 0')
+  +   .gte(0, 'Horas deve ser maior ou igual a 0')
+      .max(24, 'Horas deve ser no máximo 24'),
+  ```
+  (`.positive(...)` em Zod é equivalente a `.gt(0, ...)`.)
+- **Sintoma esperado:** `POST /games/:id/sessions` com `hours: 0`
+  passa a ser aceito, criando uma sessão de duração nula. Horas
+  negativas continuam rejeitadas (`.gte(0)` barra `< 0`) e horas
+  > 24 também (via `.max(24)`). O impacto é que o total de horas do
+  jogo pode acumular registros fantasmas de 0 h, inflando a contagem
+  de sessões no histórico sem alterar o total.
+- **CT relacionado (Apêndice B):** CT25 (sessão rejeita `hours = 0`).
