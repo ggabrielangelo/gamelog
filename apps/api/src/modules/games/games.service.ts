@@ -95,6 +95,7 @@ export async function updateGame(_userId: string, gameId: string, data: UpdateGa
       rating: ratingUpdate,
       coverUrl: data.coverUrl === undefined ? undefined : data.coverUrl,
       notes: data.notes ?? null,
+      addedAt: new Date(),
     },
   });
 

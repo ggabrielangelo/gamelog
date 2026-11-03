@@ -779,3 +779,45 @@ todo, B01–B24).
   quando `avgRating` é nulo) — este foi o CT deixado como manual
   pela Seção 11 do CLAUDE.md, de modo que B21 é detectável só por
   QA manual, não pela suíte Cypress automatizada.
+
+---
+
+## B22 — Edição de jogo reseta `addedAt` para o momento atual
+
+- **Severidade:** baixa
+- **Categoria:** estado (imutabilidade implícita de `addedAt` — o
+  campo marca quando o jogo entrou no backlog, nunca a última
+  edição)
+- **Localização:** `apps/api/src/modules/games/games.service.ts`
+  (função `updateGame`, bloco `data` do `prisma.game.update`)
+- **Diff aplicado:**
+  ```diff
+      const updated = await prisma.game.update({
+        where: { id: gameId },
+        data: {
+          title: data.title ?? undefined,
+          platform: data.platform ?? undefined,
+          genre: data.genre === undefined ? undefined : data.genre,
+          status: data.status ?? undefined,
+          rating: ratingUpdate,
+          coverUrl: data.coverUrl === undefined ? undefined : data.coverUrl,
+          notes: data.notes ?? null,
+  +       addedAt: new Date(),
+        },
+      });
+  ```
+- **Sintoma esperado:** qualquer `PATCH /games/:id` (mudar status,
+  título, avaliar, mudar notas, qualquer coisa) sobrescreve o
+  `addedAt` do jogo com `new Date()`. Como `GET /games` faz
+  `orderBy: { addedAt: 'desc' }`, o efeito colateral é que o jogo
+  acabado de editar **salta para o topo da lista**, deslocando a
+  ordenação cronológica original — o backlog deixa de refletir "o
+  que foi adicionado primeiro". No detalhe do jogo, a data de
+  entrada (quando exibida) também muda. É um bug sutil que a maior
+  parte dos CTs do Apêndice B não dispara explicitamente, mas que
+  QA exploratório pode notar ao editar um jogo antigo e vê-lo
+  reaparecer no topo da lista.
+- **CT relacionado (Apêndice B):** nenhum CT direto; sintoma
+  observável em sessões exploratórias (Cenário B) e, indiretamente,
+  em CT27 (lista ordenada por `addedAt` desc) se o teste editar um
+  jogo e esperar que a posição não mude.
