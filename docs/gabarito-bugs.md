@@ -33,3 +33,30 @@ todo, B01–B24).
   pode ter apenas 2 caracteres.
 - **CT relacionado (Apêndice B):** CT03 (senha curta rejeitada no
   cadastro).
+
+---
+
+## B02 — Comprimento mínimo do título do jogo removido
+
+- **Severidade:** baixa
+- **Categoria:** validação (regra de negócio Seção 7.5 do CLAUDE.md)
+- **Localização:** `apps/api/src/modules/games/games.schema.ts:8` e `:19`
+- **Diff aplicado:**
+  ```diff
+  // createGameSchema (linha ~8)
+    title: z
+      .string()
+      .trim()
+  -   .min(1, 'Título é obrigatório')
+      .max(120, 'Título deve ter no máximo 120 caracteres'),
+
+  // updateGameSchema (linha ~19)
+  -   title: z.string().trim().min(1).max(120).optional(),
+  +   title: z.string().trim().max(120).optional(),
+  ```
+- **Sintoma esperado:** criação e edição de jogo aceitam título vazio
+  (`""`) ou composto só por espaços (que o `.trim()` reduz a `""`),
+  gerando cards sem título legível na lista. A regra do contrato
+  (título obrigatório, 1 a 120 caracteres) é violada.
+- **CT relacionado (Apêndice B):** CT14 (criação rejeita título
+  vazio) e análogo de edição.

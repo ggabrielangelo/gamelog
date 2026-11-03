@@ -5,7 +5,6 @@ export const createGameSchema = z.object({
   title: z
     .string()
     .trim()
-    .min(1, 'Título é obrigatório')
     .max(120, 'Título deve ter no máximo 120 caracteres'),
   platform: gamePlatformSchema,
   genre: z.string().trim().max(60).optional().nullable(),
@@ -16,7 +15,7 @@ export const createGameSchema = z.object({
 
 export const updateGameSchema = z
   .object({
-    title: z.string().trim().min(1).max(120).optional(),
+    title: z.string().trim().max(120).optional(),
     platform: gamePlatformSchema.optional(),
     genre: z.string().trim().max(60).optional().nullable(),
     status: gameStatusSchema.optional(),
