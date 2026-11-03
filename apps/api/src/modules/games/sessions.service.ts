@@ -32,7 +32,6 @@ export async function listSessions(userId: string, gameId: string) {
   await findOwnedGame(userId, gameId);
   const sessions = await prisma.playSession.findMany({
     where: { gameId },
-    orderBy: { playedAt: 'desc' },
   });
   return sessions;
 }

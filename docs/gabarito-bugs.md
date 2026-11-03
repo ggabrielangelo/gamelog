@@ -475,3 +475,39 @@ todo, B01–B24).
   sinal mais detectável.
 - **CT relacionado (Apêndice B):** CT14 e CT15 (criação/edição com
   dados inválidos exibem mensagem de erro).
+
+---
+
+## B15 — Lista de sessões sem ordenação por data
+
+- **Severidade:** média
+- **Categoria:** lógica (apresentação consistente de histórico)
+- **Localização:** `apps/api/src/modules/games/sessions.service.ts`
+  (função `listSessions`)
+- **Diff aplicado:**
+  ```diff
+   export async function listSessions(userId: string, gameId: string) {
+     await findOwnedGame(userId, gameId);
+     const sessions = await prisma.playSession.findMany({
+       where: { gameId },
+  -    orderBy: { playedAt: 'desc' },
+     });
+     return sessions;
+   }
+  ```
+  **Nota de localização:** o enunciado considerou a hipótese de a
+  função viver em `games.service.ts` ou em `GameDetailPage.tsx`. A
+  implementação da `main` isola a listagem em
+  `sessions.service.ts::listSessions` e **não** reordena no
+  frontend (`GameDetailPage.tsx` não tem `.sort(...)`), portanto a
+  única mudança necessária foi remover o `orderBy` do backend.
+- **Sintoma esperado:** o `GET /games/:id/sessions` retorna as
+  sessões na ordem natural do SQLite (ordem de inserção, por `id`
+  gerado via UUID — ou seja, ordem imprevisível e sem relação com a
+  data). A lista `sessions-list` do detalhe do jogo exibe entradas
+  "fora de ordem" — uma sessão de ontem pode aparecer depois de uma
+  de semana passada. O total de horas no cabeçalho (
+  `game-detail-hours-total`) permanece correto, porque é agregado
+  por `_sum`, independente de ordenação.
+- **CT relacionado (Apêndice B):** CT26 (lista de sessões ordenada
+  por data desc).
