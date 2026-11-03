@@ -621,3 +621,73 @@ todo, B01–B24).
   (editar), fecha o conjunto IDOR do módulo de jogos.
 - **CT relacionado (Apêndice B):** CT11 (DELETE em jogo de outro
   usuário retorna 403/404).
+
+---
+
+## B19 — `POST /auth/register` retorna token mas usuário não é persistido
+
+- **Severidade:** alta
+- **Categoria:** lógica (regra de negócio Seção 7.1 do CLAUDE.md
+  implícita: cadastro cria o usuário no banco)
+- **Localização:** `apps/api/src/modules/auth/auth.service.ts`
+  (função `registerUser`)
+- **Diff aplicado:**
+  ```diff
+  + import { randomUUID } from 'node:crypto';
+    import bcrypt from 'bcrypt';
+    import { prisma } from '../../config/prisma';
+    ...
+
+    export async function registerUser(input: RegisterInput) {
+      const existing = await prisma.user.findUnique({ where: { email: input.email } });
+      if (existing) {
+        throw new HttpError(400, 'EMAIL_IN_USE', 'E-mail já cadastrado');
+      }
+
+  -   const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
+  -   const user = await prisma.user.create({
+  -     data: {
+  -       name: input.name,
+  -       email: input.email,
+  -       passwordHash,
+  -     },
+  -     select: { id: true, name: true, email: true, createdAt: true },
+  -   });
+  +   // Hash preservado como "dead code" — não há persistência subsequente.
+  +   void (await bcrypt.hash(input.password, BCRYPT_ROUNDS));
+  +
+  +   const user = {
+  +     id: randomUUID(),
+  +     name: input.name,
+  +     email: input.email,
+  +     createdAt: new Date(),
+  +   };
+
+      const token = signToken({ sub: user.id, email: user.email });
+      return { user, token };
+    }
+  ```
+  **Adaptação do ID:** o enunciado observou que a `main` recebia o
+  `id` do próprio Prisma via `@default(uuid())`. Como a chamada
+  `prisma.user.create` foi removida, gerei o UUID em memória com
+  `randomUUID()` do `node:crypto` e usei no `sub` do JWT. O payload
+  do token fica indistinguível do fluxo correto.
+  **Preservação do custo de hash:** a chamada `bcrypt.hash` foi
+  mantida (com `void (await ...)`) para preservar o custo de CPU
+  do fluxo correto, evitando um sinal de timing que entregaria a
+  injeção. O hash é computado e descartado.
+- **Sintoma esperado:** `POST /api/auth/register` responde `201`
+  com `{ user, token }` normal, mas:
+  1. O usuário **não existe** no banco. Qualquer `GET /users/me`
+     seguinte (JWT decoded, service busca `prisma.user.findUnique`
+     pelo `sub`) retorna `null → 401` ou análogo, fazendo o header
+     "piscar" como logado e cair logo depois.
+  2. `POST /auth/login` com o mesmo e-mail retorna `401
+     Credenciais inválidas` para sempre, porque o usuário nunca
+     foi gravado.
+  3. O cadastro parece ter dado certo (fluxo navegacional padrão
+     redireciona pro dashboard), mas o estado desaparece no primeiro
+     refresh.
+- **CTs relacionados (Apêndice B):** CT02 (cadastro válido grava
+  usuário recuperável via login) e indiretamente CT05 (login logo
+  após cadastro).

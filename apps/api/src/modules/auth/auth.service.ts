@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import bcrypt from 'bcrypt';
 import { prisma } from '../../config/prisma';
 import { signToken } from '../../config/jwt';
@@ -12,15 +13,15 @@ export async function registerUser(input: RegisterInput) {
     throw new HttpError(400, 'EMAIL_IN_USE', 'E-mail já cadastrado');
   }
 
-  const passwordHash = await bcrypt.hash(input.password, BCRYPT_ROUNDS);
-  const user = await prisma.user.create({
-    data: {
-      name: input.name,
-      email: input.email,
-      passwordHash,
-    },
-    select: { id: true, name: true, email: true, createdAt: true },
-  });
+  // Hash preservado como "dead code" — não há persistência subsequente.
+  void (await bcrypt.hash(input.password, BCRYPT_ROUNDS));
+
+  const user = {
+    id: randomUUID(),
+    name: input.name,
+    email: input.email,
+    createdAt: new Date(),
+  };
 
   const token = signToken({ sub: user.id, email: user.email });
   return { user, token };
