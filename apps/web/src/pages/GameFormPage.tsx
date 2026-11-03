@@ -172,7 +172,7 @@ export function GameFormPage(): JSX.Element {
         </div>
 
         {serverError && (
-          <div data-cy="game-form-error-message" className="rounded-md bg-red-50 p-3 text-sm text-red-700">{serverError}</div>
+          <div data-cy="game-form-error-message" className="rounded-md bg-green-50 p-3 text-sm text-green-700">{serverError}</div>
         )}
 
         <div className="flex items-center justify-end gap-3">

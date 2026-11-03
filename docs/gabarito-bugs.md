@@ -446,3 +446,32 @@ todo, B01–B24).
   e podem disparar toasts de erro aleatórios.
 - **CT relacionado (Apêndice B):** CT07 (logout redireciona para
   `/login` e invalida sessão).
+
+---
+
+## B14 — Toast de erro do formulário usa paleta de sucesso
+
+- **Severidade:** média
+- **Categoria:** interface (semântica de cor em feedback)
+- **Localização:** `apps/web/src/pages/GameFormPage.tsx:175`
+  (bloco condicional de renderização de `game-form-error-message`)
+- **Diff aplicado:**
+  ```diff
+          {serverError && (
+  -         <div data-cy="game-form-error-message" className="rounded-md bg-red-50 p-3 text-sm text-red-700">{serverError}</div>
+  +         <div data-cy="game-form-error-message" className="rounded-md bg-green-50 p-3 text-sm text-green-700">{serverError}</div>
+          )}
+  ```
+  (A mensagem, o `data-cy` e a lógica de visibilidade estão intactos
+  — só o esquema de cores mudou.)
+- **Sintoma esperado:** quando o backend recusa um `POST /games` ou
+  `PATCH /games/:id` (ex.: título vazio, URL de capa inválida), o
+  bloco de erro aparece com fundo verde-claro e texto verde-escuro
+  — visualmente idêntico a um toast de sucesso. O usuário pode
+  interpretar que a operação deu certo e navegar embora, embora o
+  jogo não tenha sido salvo. Toasts de erro **em outras páginas**
+  (ex.: `login-error-message`, `register-error-message`) permanecem
+  vermelhos — a inconsistência de cor dentro do próprio produto é o
+  sinal mais detectável.
+- **CT relacionado (Apêndice B):** CT14 e CT15 (criação/edição com
+  dados inválidos exibem mensagem de erro).
