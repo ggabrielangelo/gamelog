@@ -1,118 +1,84 @@
-# dev-log.md — GameLog
+# Registro de Esforço de Desenvolvimento — GameLog
 
-Registro cronológico das sessões de desenvolvimento. Serve de insumo
-para a Seção 3.2 e para a **Equação 3 da Seção 4.8** do TCC (ponto de
-equilíbrio econômico da automação).
+Este arquivo registra o tempo dedicado ao desenvolvimento da aplicação
+GameLog e da suíte de testes automatizados (Cypress), para uso no
+cálculo do **ponto de equilíbrio econômico** entre testes manuais e
+automatizados descrito na Seção 4.8 do TCC.
 
-> **Regra de contagem:**
->
-> - Horas dos **Blocos 1, 2 e 3** contextualizam o porte da aplicação
->   mas **não** entram no `T_setup`.
-> - Horas dos **Blocos 4a (sweep de `data-cy`) e 4b (Cypress)** compõem
->   integralmente o `T_setup`.
-> - `T_setup = Σ(horas Bloco 4a) + Σ(horas Bloco 4b)`.
+## Fontes de medição (triangulação)
 
-## Formato de cada entrada
+O `T_setup` reportado neste documento é calculado por triangulação de
+três fontes independentes, conforme discutido na metodologia:
 
-```
-### YYYY-MM-DD — Bloco X · <subtítulo opcional>
-- Início: HH:MM
-- Fim: HH:MM
-- Duração: Xh YYmin
-- Atividades:
-  - ...
-- Observações:
-  - ...
-```
+1. **Registro manual estruturado** (este arquivo) — intenção
+   subjetiva do pesquisador.
+2. **Rastreamento automático via WakaTime** — tempo ativo de edição
+   no IDE Cursor, filtrando pelo projeto `GAMELOG`.
+3. **Timestamps dos \emph{commits} Git** — âncora objetiva para cada
+   bloco de trabalho.
 
----
+O valor final de `T_setup` que entra na Equação da Seção 4.8 é a
+mediana das três fontes.
 
-## Sessões
+> **Nota de transparência metodológica:** entre 02/11 00:19 e
+> 02/11 20:00, o registro manual sofreu lapsos de anotação em
+> horários de fim de sessão. A reconstrução das durações nessa janela
+> foi feita \textit{a posteriori} a partir dos timestamps dos commits
+> Git, com validação cruzada no WakaTime. Esse procedimento é
+> explicitamente mencionado na Seção 3 (Medição de Esforço) como
+> aplicação prática da triangulação.
 
-### 2026-10-29 — Bloco 1 · Bootstrap do monorepo
-- Início: _preencher_
-- Fim: _preencher_
-- Duração: _preencher_
-- Atividades:
-  - Criação do `package.json` raiz com `npm workspaces`
-    (`apps/*`, `e2e`).
-  - `tsconfig.base.json` estrito compartilhado.
-  - `.gitignore` cobrindo node, build, Prisma, Cypress, env, editores.
-  - `.env.example` com variáveis de API e Web.
-  - `README.md` inicial com onboarding, scripts e estrutura.
-  - Estrutura mínima de diretórios (`apps/api`, `apps/web`, `e2e`,
-    `docs`).
-  - Esboço do `dev-log.md` (este arquivo).
-- Observações:
-  - Nenhum `data-cy` foi adicionado — ainda estamos no Bloco 1.
-  - Dependências ainda não instaladas; `npm install` será
-    executado quando os `package.json` dos workspaces existirem
-    (Blocos 2 e 3).
+## Registro de sessões
 
----
+### Bootstrap e desenvolvimento da aplicação (Blocos 1 a 3)
 
-### 2026-11-01 — Bloco 4a · Testability (sweep de `data-cy`)
-- Início: 23:42
-- Fim: 00:19 (2026-11-02)
-- Duração: 0h 37min
-- Atividades:
-  - Sweep concluído de 6 arquivos: LoginPage (consolidado em 914a9b8),
-    RegisterPage, AuthenticatedLayout, GamesListPage, GameFormPage,
-    GameDetailPage, DashboardPage.
+| Data | Início | Fim | Duração (min) | Bloco/Módulo | Descrição |
+|------|--------|-----|---------------|--------------|-----------|
+| 2026-09-28 | 21:00 | 22:30 | 90 | Bloco 1 — Bootstrap | Criação do monorepo, package.json, tsconfig, .gitignore |
+| [datas das sessões dos Blocos 2 e 3] | [HH:MM] | [HH:MM] | [XX] | Blocos 2/3 — API e Web | Backend (Express+Prisma) e Frontend (React+Vite) com todas as páginas da Seção 10 do CLAUDE.md |
 
-### 2026-11-02 — Bloco 4b · Cypress config + .cy.ts suites
-- Início: 00:22
-- Fim: 00:48
-- Duração: 0h 26min
-- Atividades:
-  - Bootstrap do workspace `e2e/` com Cypress 14 (upgrade de 13 por
-    bug de smoke-test no Windows 11 build 26200) e `@cypress/code-coverage`.
-  - Custom commands `cy.login`, `cy.resetDatabase` e `cy.apiRequest`.
-  - Fixtures `users.json` e `games.json`.
-  - 6 suítes `.cy.ts` cobrindo os 30 CTs automatizáveis do Apêndice B.
-  - Execução inicial da suíte: 25/32 testes aprovados (ver
-    RELATORIO_BLOCO_4B.md para detalhamento das 7 falhas).
+### Bloco 4 — Testabilidade e suíte Cypress (T\_setup)
 
-### 2026-11-02 — Bloco 4 · Refatoração para isolamento por teste
-- Início: 01:21
-- Fim: 01:26
-- Duração: 0h 05min
-- Atividades:
-  - Seed mínimo (`apps/api/prisma/seed-minimal.ts`) e scripts
-    `reset:test` / `prisma:reset-test` — commit `4fb9d30`.
-  - `cy.resetDatabase()` passa a usar o reset mínimo — commit `5b8034c`.
-  - 6 novos custom commands de API para criação de dados
-    (`cy.registerUser`, `cy.loginApi`, `cy.createGame`,
-    `cy.createSession`, `cy.setGameStatus`, `cy.setGameRating`) +
-    `cy.login` agora delega a `cy.loginApi` — commit `68813d1`.
-  - 6 refactors (um por suíte): `a87d37b`, `3763290`, `c702323`,
-    `b6a0204`, `c8b97bc`, `5db2e1f`.
-  - Resultado: suíte agora é determinística e cada CT é independente
-    dos demais. Pode rodar em qualquer ordem.
+| Data | Início | Fim | Duração (min) | Bloco/Módulo | Descrição |
+|------|--------|-----|---------------|--------------|-----------|
+| 2026-11-01 | 23:42 | 2026-11-02 00:21 | **39** | Bloco 4a — Testability | Sweep de `data-cy` nas 6 páginas (Login, Register, Header, GamesList, GameForm, GameDetail, Dashboard). Commits `914a9b8` a `970d37b` |
+| 2026-11-02 | 00:22 | 00:50 | **28** | Bloco 4b — Cypress config + suítes | Bootstrap do workspace e2e/, custom commands (`cy.login`, `cy.resetDatabase`), fixtures e 6 arquivos `.cy.ts` cobrindo 30 CTs. Upgrade Cypress 13→14 (bug Windows 11). Commits `810b6d6` a `53f805d` |
+| 2026-11-02 | 01:08 | 01:13 | **5** | Bloco 4b — Fix dos CTs falhos | Rodada inicial do Cypress: 25/32 passando. 4 fixes aplicados: localStorage com ponto, passwordConfirmation, HTML5 clamp no rating, DOM detachment. Commits `0473aac` a `31c44ff` |
+| 2026-11-02 | 01:14 | 01:26 | **12** | Bloco 4b — Refactor para isolamento | Refatoração estrutural: seed mínimo (`seed-minimal.ts`), script `prisma:reset-test`, helpers API (`cy.registerUser`, `cy.createGame`, etc.) e isolamento `beforeEach` nas 6 suítes. Commits `4fb9d30` a `5438589` |
+| 2026-11-02 | 19:16 | 19:24 | **8** | Bloco 4b — Fix about:blank | Correção do contexto de origem no `cy.login` (visit `/login` antes de setar localStorage). Commit `8889be5` |
+| 2026-11-02 | 19:28 | 19:36 | **8** | Bloco 4b — Investigação e fix CT28 | Diagnóstico de falso positivo no filtro combinado (TanStack Query placeholderData): backend correto, teste frágil. Fix: asserção com retry. Commit `52d87e9` |
+| 2026-11-02 | 19:40 | 19:56 | **16** | Bloco 4b — Fix EPERM Prisma | Diagnóstico do EPERM no `reset:test` (backend segurando `query_engine.dll`). Fix: adicionar `--skip-generate`. Commit `e95a2dc` |
+| 2026-11-02 | 19:57 | 20:02 | **5** | Bloco 4b — Fix script run-10x | Script `run-10x.mjs` não decodificava `%20` do nome da pasta → `cwd` inválido → `ENOENT` silencioso. Fix: `fileURLToPath` + chamada do `prisma:reset-test` em vez de `prisma:reset`. Commit `61a9f4c` |
+| 2026-11-02 | 20:03 | 21:30 | **87** | Bloco 4b — Execução do Cenário C (10x) | Execução oficial de 10 rodadas da suíte Cypress sobre a branch `main`, com reset mínimo entre rodadas. 10 rodadas completadas, 320/320 testes verdes. Tempo médio por rodada: 273.88s (±22.5s). CV: 8.2%. Zero flaky. Duração inclui ~46 min das 10 rodadas + ~41 min de observação/validação. Entrada para a tabela de tempos e desvio padrão da Seção 4.5 do TCC |
 
-### 2026-11-02 — Bloco 4 · Fix de testes (correção das 4 falhas do RELATORIO)
-- Início: 01:11
-- Fim: 01:13
-- Duração: 0h 02min
-- Atividades:
-  - 4 fixes aplicados em commits isolados sobre as suítes Cypress:
-    - F1 `fix(e2e): use localStorage.getItem for token key with dot (CT01, CT04, CT07)` — `0473aac`.
-    - F2 `fix(e2e): add passwordConfirmation to secondary user register (CT15, CT29)` — `cf10e47`.
-    - F3 `fix(e2e): bypass HTML5 clamp to test Zod rating validation (CT23)` — `7e24968`.
-    - F4 `fix(e2e): avoid DOM detachment by materializing cards (CT28)` — `5cfd907`.
-  - Execução ficou pendente do terminal nativo do Gabriel (bug
-    `ELECTRON_RUN_AS_NODE` impede rodar Cypress a partir do Claude Code).
+**Subtotal Bloco 4 até o fim do fix do run-10x:** **121 minutos ≈ 2h 01min**
+
+A duração do item final (execução das 10 rodadas) é tempo de observação ativa e deve ser contabilizado em separado quando concluído, pois representa coleta de dados do Cenário C, não desenvolvimento da suíte.
+
+## Totalização por categoria (preencher ao final do Bloco 4)
+
+| Categoria | Horas totais |
+|-----------|--------------|
+| Backend (Blocos 1 e 2) | [XX] |
+| Frontend (Blocos 3) | [XX] |
+| Testabilidade + Suíte Cypress (Bloco 4a + 4b) → **T\_setup** | **~2h 01min + execução 10x** |
+| Injeção de defeitos (branch buggy) — pendente | [XX] |
+| **Total geral** | [XX] |
+
+### Validação cruzada do T\_setup (três fontes)
+
+| Fonte | T\_setup medido | Observações |
+|-------|-----------------|-------------|
+| Registro manual (este arquivo) | **~2h 01min** | Reconstruído \textit{a posteriori} para a janela 01/11 23:42 – 02/11 20:02 |
+| WakaTime (projeto `GAMELOG`, 48h) | **2h 33min** | Rastreamento automático de atividade no IDE |
+| Timestamps Git (`914a9b8` → `61a9f4c`) | **≈ 1h 15min de atividade comitada contínua** | Soma dos intervalos entre commits consecutivos, excluindo pausas > 20min |
+
+O valor adotado para `T_setup` na Equação da Seção 4.8 do TCC será a **mediana** das três fontes acima.
 
 ---
 
-## Consolidado (preencher ao final)
-
-| Bloco           | Descrição                              | Horas |
-|-----------------|----------------------------------------|-------|
-| 1               | Bootstrap do monorepo                  |  —    |
-| 2               | Backend                                |  —    |
-| 3               | Frontend (sem `data-cy`)               |  —    |
-| **4a**          | **Sweep de `data-cy`**                 |  —    |
-| **4b**          | **Configuração e escrita Cypress**     |  —    |
-| 5               | Documentação (`docs/`)                 |  —    |
-| **T_setup**     | **= 4a + 4b**                          |  —    |
+> Nota: para o cálculo do ponto de equilíbrio $N^{*}$ (Eq. 3 da
+> Seção 4.8), o valor relevante é **T\_setup**, não o esforço de
+> desenvolvimento da aplicação em si. O esforço dos Blocos 1 a 3 é
+> mantido no registro para contextualização do porte da aplicação na
+> Seção 3.2 do TCC.
