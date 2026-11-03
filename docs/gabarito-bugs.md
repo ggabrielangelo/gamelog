@@ -60,3 +60,25 @@ todo, B01–B24).
   (título obrigatório, 1 a 120 caracteres) é violada.
 - **CT relacionado (Apêndice B):** CT14 (criação rejeita título
   vazio) e análogo de edição.
+
+---
+
+## B03 — Intervalo de validação da avaliação (rating) removido
+
+- **Severidade:** baixa
+- **Categoria:** validação (regra de negócio Seção 7.9 do CLAUDE.md)
+- **Localização:** `apps/api/src/modules/games/games.schema.ts:23`
+  (campo `rating` dentro de `updateGameSchema`)
+- **Diff aplicado:**
+  ```diff
+  -   rating: z.number().int().min(1, 'Avaliação mínima: 1').max(10, 'Avaliação máxima: 10').optional().nullable(),
+  +   rating: z.number().int().optional().nullable(),
+  ```
+- **Sintoma esperado:** o endpoint `PATCH /games/:id` aceita qualquer
+  inteiro para `rating` (ex.: `0`, `-5`, `11`, `999`), persistindo o
+  valor fora do intervalo contratado [1, 10]. A regra adicional de
+  que avaliação só pode existir para jogos `COMPLETED` **permanece**
+  intacta (está no service, não no schema), de modo que B03 é um bug
+  isolado de validação de intervalo.
+- **CT relacionado (Apêndice B):** CT23 (rating fora do intervalo
+  rejeitado).

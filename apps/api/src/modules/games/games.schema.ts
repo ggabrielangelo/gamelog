@@ -19,7 +19,7 @@ export const updateGameSchema = z
     platform: gamePlatformSchema.optional(),
     genre: z.string().trim().max(60).optional().nullable(),
     status: gameStatusSchema.optional(),
-    rating: z.number().int().min(1, 'Avaliação mínima: 1').max(10, 'Avaliação máxima: 10').optional().nullable(),
+    rating: z.number().int().optional().nullable(),
     coverUrl: z.string().trim().url('URL de capa inválida').optional().nullable(),
     notes: z.string().trim().max(2000).optional().nullable(),
   })
