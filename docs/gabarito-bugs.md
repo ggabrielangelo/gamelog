@@ -586,3 +586,38 @@ todo, B01–B24).
   uma série escalonada de IDOR.
 - **CT relacionado (Apêndice B):** CT13 (PATCH em jogo de outro
   usuário retorna 403/404).
+
+---
+
+## B18 — `DELETE /games/:id` não valida posse do recurso
+
+- **Severidade:** alta
+- **Categoria:** permissão / autorização (regra de negócio Seção 7.4
+  e 7.7 do CLAUDE.md: "um usuário só remove seus próprios jogos")
+- **Localização:** `apps/api/src/modules/games/games.service.ts`
+  (função `deleteGame`)
+- **Diff aplicado:**
+  ```diff
+  - export async function deleteGame(userId: string, gameId: string): Promise<void> {
+  -   await findOwnedGame(userId, gameId);
+  -   // Cascade das sessions é garantido via Prisma relation (Seção 7.7).
+  -   await prisma.game.delete({ where: { id: gameId } });
+  - }
+  + export async function deleteGame(_userId: string, gameId: string): Promise<void> {
+  +   // Cascade das sessions é garantido via Prisma relation (Seção 7.7).
+  +   await prisma.game.delete({ where: { id: gameId } });
+  + }
+  ```
+  (`prisma.game.delete` fica "cru" conforme pedido — o 404 nativo
+  do Prisma ao tentar deletar um id inexistente passa a sair como
+  `500` pelo middleware de erro, uma mudança colateral menor em
+  relação ao contrato. O foco do bug é a ausência da verificação
+  de dono.)
+- **Sintoma esperado:** `DELETE /api/games/:id` autenticado permite
+  apagar jogo de qualquer usuário. O cascade de `PlaySession` é
+  acionado pelo Prisma relation, de modo que a remoção também apaga
+  todas as sessões vinculadas — um usuário malicioso pode zerar o
+  histórico de outro completamente. Combinado com B11 (ler) e B17
+  (editar), fecha o conjunto IDOR do módulo de jogos.
+- **CT relacionado (Apêndice B):** CT11 (DELETE em jogo de outro
+  usuário retorna 403/404).

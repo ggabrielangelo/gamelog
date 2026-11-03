@@ -101,8 +101,7 @@ export async function updateGame(_userId: string, gameId: string, data: UpdateGa
   return updated;
 }
 
-export async function deleteGame(userId: string, gameId: string): Promise<void> {
-  await findOwnedGame(userId, gameId);
+export async function deleteGame(_userId: string, gameId: string): Promise<void> {
   // Cascade das sessions é garantido via Prisma relation (Seção 7.7).
   await prisma.game.delete({ where: { id: gameId } });
 }
