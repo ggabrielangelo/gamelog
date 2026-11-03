@@ -691,3 +691,61 @@ todo, B01–B24).
 - **CTs relacionados (Apêndice B):** CT02 (cadastro válido grava
   usuário recuperável via login) e indiretamente CT05 (login logo
   após cadastro).
+
+---
+
+## B20 — E-mail duplicado em cadastro retorna falso sucesso em vez de 400/409
+
+- **Severidade:** alta
+- **Categoria:** lógica (regra de negócio Seção 7.1 do CLAUDE.md:
+  e-mail único; cadastro duplicado deve ser rejeitado)
+- **Localização:** `apps/api/src/modules/auth/auth.service.ts`
+  (função `registerUser`, bloco `if (existing)`)
+- **Diff aplicado:**
+  ```diff
+    export async function registerUser(input: RegisterInput) {
+      const existing = await prisma.user.findUnique({ where: { email: input.email } });
+      if (existing) {
+  -     throw new HttpError(400, 'EMAIL_IN_USE', 'E-mail já cadastrado');
+  +     const token = signToken({ sub: randomUUID(), email: existing.email });
+  +     return {
+  +       user: {
+  +         id: existing.id,
+  +         name: existing.name,
+  +         email: existing.email,
+  +         createdAt: existing.createdAt,
+  +       },
+  +       token,
+  +     };
+      }
+      ...
+    }
+  ```
+- **Interação com B19 — decisão de implementação:** o enunciado
+  original esperava interceptar o erro Prisma `P2002` do
+  `prisma.user.create` ao bater em unique constraint. Como B19
+  removeu o `prisma.user.create`, esse `catch` não existe mais na
+  branch `buggy`. Apliquei a **alternativa simpler** proposta no
+  próprio enunciado: transformar o próprio ramo `if (existing)` que
+  já fazia o lookup prévio num "falso sucesso" com token de `sub`
+  fabricado via `randomUUID()`. Essa abordagem desacopla B20 de B19
+  — não depende da ordem em que os dois foram injetados, bastando
+  que a verificação prévia por `findUnique` continue existindo
+  (verdadeiro em todos os estados pós-B19). Os dois bugs **compõem**
+  um cenário cumulativo: cadastrar um e-mail novo cria um "fantasma"
+  (B19); cadastrar com um e-mail já existente devolve um token que
+  "parece" ser o do usuário real mas com `sub` que não bate com
+  ninguém (B20).
+- **Sintoma esperado:** `POST /api/auth/register` com e-mail já em
+  uso responde `201` com um `{ user, token }` plausível (o `user.id`
+  é o do titular real, o `email` bate), em vez do esperado
+  `400 EMAIL_IN_USE`. O frontend grava o token no `localStorage` e
+  navega para o dashboard. Mas, como `token.sub` é um UUID aleatório
+  que não corresponde a nenhum usuário do banco, o próximo
+  `GET /users/me` retorna `401` (ou análogo), expondo a inconsistência.
+  O cenário é especialmente insidioso porque **mascara** a mensagem
+  "E-mail já cadastrado" que seria a pista natural para o usuário
+  corrigir — ele é redirecionado como se fosse um cadastro novo.
+- **CT relacionado (Apêndice B):** CT01 (cadastro com e-mail
+  duplicado rejeitado) ou análogo CT equivalente na numeração
+  final.

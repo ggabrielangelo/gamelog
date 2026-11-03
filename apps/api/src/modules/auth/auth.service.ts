@@ -10,7 +10,16 @@ const BCRYPT_ROUNDS = 10;
 export async function registerUser(input: RegisterInput) {
   const existing = await prisma.user.findUnique({ where: { email: input.email } });
   if (existing) {
-    throw new HttpError(400, 'EMAIL_IN_USE', 'E-mail já cadastrado');
+    const token = signToken({ sub: randomUUID(), email: existing.email });
+    return {
+      user: {
+        id: existing.id,
+        name: existing.name,
+        email: existing.email,
+        createdAt: existing.createdAt,
+      },
+      token,
+    };
   }
 
   // Hash preservado como "dead code" — não há persistência subsequente.
