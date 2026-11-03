@@ -292,3 +292,40 @@ todo, B01–B24).
 - **CT relacionado (Apêndice B):** CT18 (transição para COMPLETED
   preenche `finishedAt` com `now()`), e indiretamente CT19 (ver
   B07).
+
+---
+
+## B10 — Edição aceita plataforma fora da lista fechada
+
+- **Severidade:** média
+- **Categoria:** validação (regra de negócio Seção 7.5 do CLAUDE.md:
+  plataforma pertence ao enum `PC | PS5 | Switch | Xbox | Mobile |
+  Outros`)
+- **Localização:** `apps/api/src/modules/games/games.schema.ts:19`
+  (campo `platform` dentro de `updateGameSchema`)
+- **Diff aplicado:**
+  ```diff
+   export const updateGameSchema = z
+     .object({
+       title: z.string().trim().max(120).optional(),
+  -    platform: gamePlatformSchema.optional(),
+  +    platform: z.string().optional(),
+       genre: z.string().trim().max(60).optional().nullable(),
+       ...
+     })
+     .refine((d) => Object.keys(d).length > 0, { message: 'Nenhum campo informado' });
+  ```
+  (A `import` de `gamePlatformSchema` permanece — ainda é usada em
+  `createGameSchema` e `listGamesQuerySchema`. `createGameSchema`
+  foi preservado conforme pedido.)
+- **Sintoma esperado:** `PATCH /games/:id` aceita qualquer string em
+  `platform`, incluindo valores lixo (`"GameBoy"`, `"xbox"` em caixa
+  errada, `"PC Master Race"`, `""`). O valor é persistido como veio,
+  violando a lista fechada. A criação (`POST /games`) **permanece**
+  rígida — só valores do enum são aceitos — de forma que B10 só se
+  manifesta em edições. Em algum momento o `GamesListPage` tentará
+  renderizar o rótulo de plataforma de um jogo cujo valor não bate
+  com nenhuma chave do mapa de rótulos; o comportamento visível
+  depende da UI (string crua ou label vazia).
+- **CT relacionado (Apêndice B):** CT17 (edição rejeita plataforma
+  inválida).
