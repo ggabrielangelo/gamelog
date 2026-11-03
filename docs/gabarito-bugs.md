@@ -372,3 +372,46 @@ todo, B01–B24).
 - **CT relacionado (Apêndice B):** CT12 (acesso a `/games/:id` de
   outro usuário retorna 403/404), equivalente ao CT29 (isolamento
   entre usuários na lista).
+
+---
+
+## B12 — Confirmação de senha não é validada contra a senha
+
+- **Severidade:** média
+- **Categoria:** lógica (regra de negócio Seção 7.1 do CLAUDE.md:
+  "Confirmação de senha obrigatória e igual à senha")
+- **Localização:** `apps/api/src/modules/auth/auth.schema.ts`
+  (schema `registerSchema`, bloco `.refine(...)` que comparava
+  `password === passwordConfirmation`)
+- **Diff aplicado:**
+  ```diff
+  - export const registerSchema = z
+  -   .object({
+  -     name: z.string().trim().min(1, 'Nome é obrigatório').max(120),
+  -     email: z.string().trim().toLowerCase().email('E-mail inválido'),
+  -     password: strongPassword,
+  -     passwordConfirmation: z.string(),
+  -   })
+  -   .refine((d) => d.password === d.passwordConfirmation, {
+  -     path: ['passwordConfirmation'],
+  -     message: 'Confirmação de senha não confere',
+  -   });
+  + export const registerSchema = z.object({
+  +   name: z.string().trim().min(1, 'Nome é obrigatório').max(120),
+  +   email: z.string().trim().toLowerCase().email('E-mail inválido'),
+  +   password: strongPassword,
+  +   passwordConfirmation: z.string(),
+  + });
+  ```
+  (O campo `passwordConfirmation` continua obrigatório como `z.string()`,
+  apenas a comparação com `password` foi removida.)
+- **Sintoma esperado:** `POST /auth/register` com
+  `password = "Senha123"` e `passwordConfirmation = "qualquer-outra"`
+  (ou até `passwordConfirmation = ""`) **cria o usuário** com
+  `201 Created`. O campo de confirmação é cosmético — a API deixa
+  de proteger contra erro de digitação da senha. No frontend, a
+  tela de cadastro continua pedindo a confirmação, mas ela nunca
+  bloqueia a submissão quando divergente (a validação do React
+  Hook Form reaproveita o schema Zod via resolver).
+- **CT relacionado (Apêndice B):** CT04 (cadastro rejeita confirmação
+  de senha divergente).

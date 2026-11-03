@@ -7,17 +7,12 @@ const strongPassword = z
   .regex(/[A-Za-z]/, 'Senha deve conter ao menos uma letra')
   .regex(/[0-9]/, 'Senha deve conter ao menos um número');
 
-export const registerSchema = z
-  .object({
-    name: z.string().trim().min(1, 'Nome é obrigatório').max(120),
-    email: z.string().trim().toLowerCase().email('E-mail inválido'),
-    password: strongPassword,
-    passwordConfirmation: z.string(),
-  })
-  .refine((d) => d.password === d.passwordConfirmation, {
-    path: ['passwordConfirmation'],
-    message: 'Confirmação de senha não confere',
-  });
+export const registerSchema = z.object({
+  name: z.string().trim().min(1, 'Nome é obrigatório').max(120),
+  email: z.string().trim().toLowerCase().email('E-mail inválido'),
+  password: strongPassword,
+  passwordConfirmation: z.string(),
+});
 
 export const loginSchema = z.object({
   email: z.string().trim().email('E-mail inválido'),
