@@ -68,7 +68,7 @@ export function DashboardPage(): JSX.Element {
         <section className="card">
           <h2 className="text-sm font-semibold text-slate-900">Avaliação média</h2>
           <p className="mt-2 text-4xl font-bold text-brand-700" data-cy="dashboard-stat-avg-rating">
-            {stats.avgRating === null ? '—' : stats.avgRating.toFixed(1)}
+            {stats.avgRating === null ? '0.0' : stats.avgRating.toFixed(1)}
           </p>
           <p className="mt-1 text-xs text-slate-500">
             Média das notas dos jogos concluídos (1 casa decimal).

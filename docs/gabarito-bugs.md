@@ -749,3 +749,33 @@ todo, B01–B24).
 - **CT relacionado (Apêndice B):** CT01 (cadastro com e-mail
   duplicado rejeitado) ou análogo CT equivalente na numeração
   final.
+
+---
+
+## B21 — `avgRating` nulo cai em `'0.0'` em vez do placeholder
+
+- **Severidade:** baixa
+- **Categoria:** interface (regra Seção 7.12 do CLAUDE.md: `avgRating`
+  retorna `null` quando não há jogo avaliado, e a UI deve exibir
+  um placeholder claro)
+- **Localização:** `apps/web/src/pages/DashboardPage.tsx:71`
+  (bloco de renderização de `dashboard-stat-avg-rating`)
+- **Diff aplicado:**
+  ```diff
+            <p className="mt-2 text-4xl font-bold text-brand-700" data-cy="dashboard-stat-avg-rating">
+  -           {stats.avgRating === null ? '—' : stats.avgRating.toFixed(1)}
+  +           {stats.avgRating === null ? '0.0' : stats.avgRating.toFixed(1)}
+            </p>
+  ```
+- **Sintoma esperado:** quando o usuário ainda não avaliou nenhum
+  jogo (ou nenhum jogo avaliado está em status `COMPLETED`), o
+  Dashboard exibe `0.0` no cartão "Avaliação média" — visualmente
+  idêntico a "jogos avaliados com nota 0", em vez do travessão
+  `—` que sinaliza ausência de dado. O backend continua retornando
+  `avgRating: null` corretamente (B21 é só na camada de
+  apresentação); a legenda abaixo ("Média das notas dos jogos
+  concluídos (1 casa decimal)") reforça a interpretação enganosa.
+- **CT relacionado (Apêndice B):** CT29 (dashboard exibe placeholder
+  quando `avgRating` é nulo) — este foi o CT deixado como manual
+  pela Seção 11 do CLAUDE.md, de modo que B21 é detectável só por
+  QA manual, não pela suíte Cypress automatizada.
