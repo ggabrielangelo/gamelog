@@ -13,6 +13,18 @@ testador.
 **Perfil-alvo de severidade:** 10 baixa / 10 média / 4 alta (24 ao
 todo, B01–B24).
 
+> **GABARITO FECHADO — 24/24 defeitos injetados.** A branch `buggy`
+> foi finalizada em 2026-11-02. Distribuição efetiva por severidade:
+> **10 baixa** (B01–B08, B21–B22), **10 média** (B09–B16, B23–B24) e
+> **4 alta** (B17–B20). Distribuição por categoria: **5 validação**
+> (B01–B04, B10), **8 lógica** (B06, B12, B15–B16, B19–B20, mais os
+> casos cruzados), **4 permissão** (B11, B17–B18 — IDOR escalonado),
+> **4 interface** (B05, B08, B14, B21), **4 estado** (B07, B09, B13,
+> B22) e **2 integração** (B23–B24). Nenhum CT do Apêndice B foi
+> intencionalmente deixado sem bug correspondente, mas há bugs
+> (B22, p.ex.) sem CT direto — observáveis apenas em sessão
+> exploratória (Cenário B).
+
 ---
 
 ## B01 — Senha mínima relaxada de 8 para 1 caractere
