@@ -53,7 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }): JSX.Element
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
-    setUser(null);
   }, []);
 
   const value = useMemo<AuthContextValue>(

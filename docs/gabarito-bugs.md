@@ -415,3 +415,34 @@ todo, B01–B24).
   Hook Form reaproveita o schema Zod via resolver).
 - **CT relacionado (Apêndice B):** CT04 (cadastro rejeita confirmação
   de senha divergente).
+
+---
+
+## B13 — Logout limpa `localStorage` mas não reseta estado do AuthContext
+
+- **Severidade:** média
+- **Categoria:** estado (regra de negócio Seção 7.3 do CLAUDE.md:
+  "Logout limpa JWT do `localStorage` do navegador e redireciona para
+  `/login`" — implicitamente também limpa o usuário em memória)
+- **Localização:** `apps/web/src/contexts/AuthContext.tsx:54-57`
+  (função `logout` dentro do `AuthProvider`)
+- **Diff aplicado:**
+  ```diff
+    const logout = useCallback(() => {
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+  -   setUser(null);
+    }, []);
+  ```
+- **Sintoma esperado:** ao clicar no botão de logout (
+  `header-logout-button`), o token é removido do `localStorage` mas
+  o estado React `user` do `AuthProvider` permanece com os dados do
+  usuário anterior. Como a rota raiz testa `user` (não o token) para
+  decidir se redireciona para `/login`, o usuário aparentemente
+  continua logado — o header ainda mostra o nome do usuário e as
+  páginas protegidas ainda renderizam, até o primeiro refresh completo
+  (quando `useEffect` roda `fetchMe` sem token e deixa `user = null`).
+  A inconsistência entre `localStorage` vazio e `AuthContext` povoado
+  gera também requisições à API sem Bearer token, que retornam `401`
+  e podem disparar toasts de erro aleatórios.
+- **CT relacionado (Apêndice B):** CT07 (logout redireciona para
+  `/login` e invalida sessão).
