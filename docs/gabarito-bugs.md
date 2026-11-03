@@ -166,3 +166,36 @@ todo, B01–B24).
   diferente".
 - **CT relacionado (Apêndice B):** CT05 (login válido com variações
   de case no e-mail).
+
+---
+
+## B07 — `finishedAt` não é limpo ao sair do status COMPLETED
+
+- **Severidade:** baixa
+- **Categoria:** estado (regra de negócio Seção 7.8 do CLAUDE.md)
+- **Localização:** `apps/api/src/modules/games/games.service.ts:80-83`
+  (função `updateGame`, bloco de transição de `finishedAt`)
+- **Diff aplicado:**
+  ```diff
+    // Regra 8: finishedAt é automático em transições para/de COMPLETED.
+    let finishedAt: Date | null | undefined = undefined;
+  - if (data.status !== undefined && data.status !== current.status) {
+  -   finishedAt = data.status === 'COMPLETED' ? new Date() : null;
+  - }
+  + if (data.status !== undefined && data.status !== current.status && data.status === 'COMPLETED') {
+  +   finishedAt = new Date();
+  + }
+  ```
+  (Preserva o preenchimento automático de `finishedAt = new Date()`
+  na transição para `COMPLETED`; remove a limpeza para `null`
+  quando o jogo sai de `COMPLETED`.)
+- **Sintoma esperado:** ao mover um jogo de `COMPLETED` para
+  `PLAYING`, `BACKLOG` ou `ABANDONED`, o campo `finishedAt` **mantém
+  a data antiga** no banco, violando a Seção 7.8 que determina
+  "`finishedAt` é limpo (`null`) ao mudar para qualquer outro
+  status". A limpeza paralela de `rating` (feita logo abaixo neste
+  mesmo service) **permanece** intacta, de forma que B07 é um bug
+  isolado — o jogo pode exibir "concluído em dd/mm/aaaa" mesmo
+  estando com status "Jogando".
+- **CT relacionado (Apêndice B):** CT19 (transição COMPLETED → outro
+  status limpa `finishedAt`).
