@@ -49,7 +49,7 @@ mediana das três fontes.
 | 2026-11-02 | 19:28 | 19:36 | **8** | Bloco 4b — Investigação e fix CT28 | Diagnóstico de falso positivo no filtro combinado (TanStack Query placeholderData): backend correto, teste frágil. Fix: asserção com retry. Commit `52d87e9` |
 | 2026-11-02 | 19:40 | 19:56 | **16** | Bloco 4b — Fix EPERM Prisma | Diagnóstico do EPERM no `reset:test` (backend segurando `query_engine.dll`). Fix: adicionar `--skip-generate`. Commit `e95a2dc` |
 | 2026-11-02 | 19:57 | 20:02 | **5** | Bloco 4b — Fix script run-10x | Script `run-10x.mjs` não decodificava `%20` do nome da pasta → `cwd` inválido → `ENOENT` silencioso. Fix: `fileURLToPath` + chamada do `prisma:reset-test` em vez de `prisma:reset`. Commit `61a9f4c` |
-| 2026-11-02 | 20:03 | 21:30 | **87** | Bloco 4b — Execução do Cenário C (10x) | Execução oficial de 10 rodadas da suíte Cypress sobre a branch `main`, com reset mínimo entre rodadas. 10 rodadas completadas, 320/320 testes verdes. Tempo médio por rodada: 273.88s (±22.5s). CV: 8.2%. Zero flaky. Duração inclui ~46 min das 10 rodadas + ~41 min de observação/validação. Entrada para a tabela de tempos e desvio padrão da Seção 4.5 do TCC |
+| 2026-11-02 | 20:03 | 21:30 | **87** | Bloco 4b — Execução do Cenário C (10x) | Execução oficial de 10 rodadas da suíte Cypress sobre a branch `main`, com reset mínimo entre rodadas. 10 rodadas completadas, 320/320 testes verdes. Tempos individuais em `experimento/tempos-cypress.csv`. Zero flaky. Entrada para a tabela de tempos e desvio padrão da Seção 4.5 do TCC |
 
 **Subtotal Bloco 4 até o fim do fix do run-10x:** **121 minutos ≈ 2h 01min**
 
