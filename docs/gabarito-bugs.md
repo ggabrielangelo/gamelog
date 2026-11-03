@@ -821,3 +821,48 @@ todo, B01–B24).
   observável em sessões exploratórias (Cenário B) e, indiretamente,
   em CT27 (lista ordenada por `addedAt` desc) se o teste editar um
   jogo e esperar que a posição não mude.
+
+---
+
+## B23 — `GET /games` ignora o parâmetro `?search=`
+
+- **Severidade:** média
+- **Categoria:** integração (contrato de API Seção 6 do CLAUDE.md:
+  `GET /games` deve suportar `?search=` como filtro de título)
+- **Localização:** `apps/api/src/modules/games/games.service.ts`
+  (função `listGames`, cláusula `where`)
+- **Diff aplicado:**
+  ```diff
+   export async function listGames(userId: string, query: ListGamesQuery) {
+     const games = await prisma.game.findMany({
+       where: {
+         userId,
+         ...(query.status ? { status: query.status } : {}),
+         ...(query.platform ? { platform: query.platform } : {}),
+  -      ...(query.search
+  -        ? { title: { contains: query.search } }
+  -        : {}),
+       },
+       orderBy: { addedAt: 'desc' },
+     });
+     return games;
+   }
+  ```
+  (Os filtros de `status` e `platform` foram preservados — só o
+  `search` foi removido.)
+- **Sintoma esperado:** o campo `games-search-input` do frontend
+  dispara requisições com `?search=<termo>` que o backend passa a
+  tratar como vazias. A lista retornada é a mesma do filtro de
+  status/plataforma vigente — o input de busca aparenta estar
+  "quebrado": digitar qualquer coisa não filtra nada. O schema de
+  validação (`listGamesQuerySchema`) continua aceitando o parâmetro
+  e o controller continua passando `query.search`, mas o service
+  descarta silenciosamente — não há erro HTTP, só comportamento
+  anômalo. Combinado com o CT28 (filtro combinado status + plataforma),
+  a observação do bug exige um teste de busca por título — status e
+  plataforma seguem filtrando normalmente.
+- **CTs relacionados (Apêndice B):** CT28 (busca por título) e, por
+  consequência, CT29 (isolamento entre usuários via busca pelo
+  título único de outro user — o teste automatizado ainda passa se
+  o isolamento for garantido pela lista crua, mas o fluxo de busca
+  deixa de funcionar).

@@ -29,9 +29,6 @@ export async function listGames(userId: string, query: ListGamesQuery) {
       userId,
       ...(query.status ? { status: query.status } : {}),
       ...(query.platform ? { platform: query.platform } : {}),
-      ...(query.search
-        ? { title: { contains: query.search } }
-        : {}),
     },
     orderBy: { addedAt: 'desc' },
   });
