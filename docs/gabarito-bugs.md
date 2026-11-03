@@ -551,3 +551,38 @@ todo, B01–B24).
   campos opcionais é o sinal mais direto para o testador.
 - **CT relacionado (Apêndice B):** CT16 (edição parcial preserva
   campos não enviados).
+
+---
+
+## B17 — `PATCH /games/:id` não valida posse do recurso
+
+- **Severidade:** alta
+- **Categoria:** permissão / autorização (regra de negócio Seção 7.4
+  e 7.6 do CLAUDE.md: "um usuário só altera seus próprios jogos")
+- **Localização:** `apps/api/src/modules/games/games.service.ts`
+  (função `updateGame`, primeira linha)
+- **Diff aplicado:**
+  ```diff
+  - export async function updateGame(userId: string, gameId: string, data: UpdateGameInput) {
+  -   const current = await findOwnedGame(userId, gameId);
+  + export async function updateGame(_userId: string, gameId: string, data: UpdateGameInput) {
+  +   const current = await prisma.game.findUnique({ where: { id: gameId } });
+  +   if (!current) throw new HttpError(404, 'GAME_NOT_FOUND', 'Jogo não encontrado');
+  ```
+  (A `main` fazia a autorização dentro do helper `findOwnedGame`,
+  que combina `findUnique` + checagem `game.userId !== userId → 403`.
+  A injeção substitui o helper por um `findUnique` cru. O 404
+  natural para jogo inexistente é preservado para não introduzir
+  um segundo sintoma — a brecha é especificamente a leitura/escrita
+  cruzada entre usuários.)
+- **Sintoma esperado:** `PATCH /games/:id` passa a aceitar qualquer
+  usuário autenticado alterando qualquer jogo, inclusive de terceiros
+  — mudar status, título, plataforma, rating (quando status for
+  `COMPLETED`), notas, capa. A escrita cruzada é persistida e as
+  mutações do TanStack Query no frontend invalidam o cache do dono
+  real, que verá o jogo alterado no próximo refresh. O `DELETE`
+  continua **protegido** (ver B18 isolado) e o `GET /games/:id` já
+  estava quebrado pelo B11, de modo que a trinca B11+B17+B18 compõe
+  uma série escalonada de IDOR.
+- **CT relacionado (Apêndice B):** CT13 (PATCH em jogo de outro
+  usuário retorna 403/404).

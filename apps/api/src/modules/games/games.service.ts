@@ -63,8 +63,9 @@ export async function getGame(_userId: string, gameId: string) {
   return { ...game, hoursTotal };
 }
 
-export async function updateGame(userId: string, gameId: string, data: UpdateGameInput) {
-  const current = await findOwnedGame(userId, gameId);
+export async function updateGame(_userId: string, gameId: string, data: UpdateGameInput) {
+  const current = await prisma.game.findUnique({ where: { id: gameId } });
+  if (!current) throw new HttpError(404, 'GAME_NOT_FOUND', 'Jogo não encontrado');
 
   const nextStatus: GameStatus = (data.status ?? (current.status as GameStatus));
 
