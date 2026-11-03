@@ -511,3 +511,43 @@ todo, B01–B24).
   por `_sum`, independente de ordenação.
 - **CT relacionado (Apêndice B):** CT26 (lista de sessões ordenada
   por data desc).
+
+---
+
+## B16 — Edição de jogo zera `notes` quando o campo é omitido
+
+- **Severidade:** média
+- **Categoria:** lógica (preservação de campos opcionais em PATCH
+  parcial — regra implícita de API REST idiomática)
+- **Localização:** `apps/api/src/modules/games/games.service.ts`
+  (função `updateGame`, campo `notes` dentro de `prisma.game.update`)
+- **Diff aplicado:**
+  ```diff
+      const updated = await prisma.game.update({
+        where: { id: gameId },
+        data: {
+          title: data.title ?? undefined,
+          platform: data.platform ?? undefined,
+          genre: data.genre === undefined ? undefined : data.genre,
+          status: data.status ?? undefined,
+          rating: ratingUpdate,
+          coverUrl: data.coverUrl === undefined ? undefined : data.coverUrl,
+  -       notes: data.notes === undefined ? undefined : data.notes,
+  +       notes: data.notes ?? null,
+        },
+      });
+  ```
+- **Sintoma esperado:** `PATCH /games/:id` com um payload que **não**
+  inclui o campo `notes` (ex.: só mudando o status, só mudando o
+  rating, só mudando a plataforma) agora apaga as notas existentes
+  no banco — porque `undefined ?? null` resolve para `null` e o
+  Prisma persiste `null`. O frontend, que envia todos os campos
+  juntos quando o usuário salva pelo `GameFormPage`, **não**
+  dispara o sintoma; o bug aparece em qualquer caminho que faça
+  PATCH parcial (um "Marcar como concluído" direto na lista, por
+  exemplo, ou em testes de API). Os campos irmãos (`genre`,
+  `coverUrl`) continuam preservando o valor com `=== undefined ?
+  undefined : data.notes` — a assimetria entre `notes` e os demais
+  campos opcionais é o sinal mais direto para o testador.
+- **CT relacionado (Apêndice B):** CT16 (edição parcial preserva
+  campos não enviados).

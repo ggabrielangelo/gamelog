@@ -93,7 +93,7 @@ export async function updateGame(userId: string, gameId: string, data: UpdateGam
       status: data.status ?? undefined,
       rating: ratingUpdate,
       coverUrl: data.coverUrl === undefined ? undefined : data.coverUrl,
-      notes: data.notes === undefined ? undefined : data.notes,
+      notes: data.notes ?? null,
     },
   });
 
