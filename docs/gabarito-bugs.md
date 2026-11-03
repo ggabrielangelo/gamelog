@@ -107,3 +107,26 @@ todo, B01–B24).
   jogo pode acumular registros fantasmas de 0 h, inflando a contagem
   de sessões no histórico sem alterar o total.
 - **CT relacionado (Apêndice B):** CT25 (sessão rejeita `hours = 0`).
+
+---
+
+## B05 — Dashboard perde precisão decimal no total de horas
+
+- **Severidade:** baixa
+- **Categoria:** interface (fidelidade de apresentação)
+- **Localização:** `apps/web/src/pages/DashboardPage.tsx:63`
+  (stat `dashboard-stat-total-hours`)
+- **Diff aplicado:**
+  ```diff
+          <div data-cy="dashboard-stat-total-hours">
+  -         <StatCard label="Horas" value={stats.totalHours.toFixed(1)} />
+  +         <StatCard label="Horas" value={stats.totalHours.toFixed(0)} />
+          </div>
+  ```
+- **Sintoma esperado:** o card "Horas" do Dashboard mostra total
+  truncado como inteiro (ex.: 4.5h vira "5", 2.4h vira "2"), em vez
+  da 1 casa decimal esperada. A média de avaliação ao lado continua
+  com 1 casa decimal (`stats.avgRating.toFixed(1)` preservado), de
+  modo que B05 é um defeito isolado de formatação do total de horas.
+- **CT relacionado (Apêndice B):** CT32 (soma total de horas na
+  home com 1 decimal).

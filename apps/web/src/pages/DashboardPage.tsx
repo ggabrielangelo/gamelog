@@ -60,7 +60,7 @@ export function DashboardPage(): JSX.Element {
           <StatCard label={statusLabel('ABANDONED')} value={stats.abandoned} />
         </div>
         <div data-cy="dashboard-stat-total-hours">
-          <StatCard label="Horas" value={stats.totalHours.toFixed(1)} />
+          <StatCard label="Horas" value={stats.totalHours.toFixed(0)} />
         </div>
       </div>
 
