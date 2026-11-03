@@ -241,3 +241,54 @@ todo, B01–B24).
 - **CTs relacionados (Apêndice B):** CT24 (card da lista mostra
   status em PT), CT20 (detalhe mostra badge de status em PT) e o
   CT28 (filtro combinado + rótulo PT no card remanescente).
+
+---
+
+## B09 — Transição para `COMPLETED` não preenche `finishedAt`
+
+- **Severidade:** média
+- **Categoria:** estado (regra de negócio Seção 7.8 do CLAUDE.md)
+- **Localização:** `apps/api/src/modules/games/games.service.ts`
+  (função `updateGame`, bloco que, após B07, continha a atribuição
+  `finishedAt = new Date()`)
+- **Diff aplicado:**
+  ```diff
+    // (bloco já reduzido por B07 — agora removido por completo)
+  - // Regra 8: finishedAt é automático em transições para/de COMPLETED.
+  - let finishedAt: Date | null | undefined = undefined;
+  - if (data.status !== undefined && data.status !== current.status && data.status === 'COMPLETED') {
+  -   finishedAt = new Date();
+  - }
+
+    // Se a transição tirou de COMPLETED, o rating deve ser removido também
+    ...
+
+    const updated = await prisma.game.update({
+      where: { id: gameId },
+      data: {
+        title: data.title ?? undefined,
+        ...
+        notes: data.notes === undefined ? undefined : data.notes,
+  -     finishedAt,
+      },
+    });
+  ```
+  (A declaração local `let finishedAt` virou código morto depois de
+  cortar a atribuição; removi também o campo `finishedAt` do objeto
+  `data` do `prisma.game.update` para não quebrar a tipagem.)
+- **Cascata com B07:** B07 já havia eliminado a limpeza de
+  `finishedAt` ao sair de `COMPLETED`; B09 remove o preenchimento ao
+  entrar em `COMPLETED`. Juntos, deixam `finishedAt` **funcionalmente
+  desativado** no fluxo de `PATCH /games/:id`: o service passa a
+  nunca tocar nesse campo, de modo que seu valor fica congelado em
+  qualquer coisa que o `createGame` tenha gravado (que ainda
+  preenche `new Date()` quando o jogo nasce `COMPLETED`).
+- **Sintoma esperado:** marcar um jogo como "Concluído" via edição
+  **não** registra data de conclusão. O detalhe do jogo exibe
+  `finishedAt = null` (ou o campo em branco na UI), apesar de o
+  status ter mudado para `COMPLETED`. Combinado com B07, o jogo pode
+  ter status `COMPLETED` sem data OU manter uma data antiga ao
+  retornar para outro status.
+- **CT relacionado (Apêndice B):** CT18 (transição para COMPLETED
+  preenche `finishedAt` com `now()`), e indiretamente CT19 (ver
+  B07).

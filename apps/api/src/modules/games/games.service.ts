@@ -76,12 +76,6 @@ export async function updateGame(userId: string, gameId: string, data: UpdateGam
     );
   }
 
-  // Regra 8: finishedAt é automático em transições para/de COMPLETED.
-  let finishedAt: Date | null | undefined = undefined;
-  if (data.status !== undefined && data.status !== current.status && data.status === 'COMPLETED') {
-    finishedAt = new Date();
-  }
-
   // Se a transição tirou de COMPLETED, o rating deve ser removido também
   // (não faz sentido manter avaliação em jogo que deixou de estar concluído).
   let ratingUpdate: number | null | undefined = data.rating ?? undefined;
@@ -99,7 +93,6 @@ export async function updateGame(userId: string, gameId: string, data: UpdateGam
       rating: ratingUpdate,
       coverUrl: data.coverUrl === undefined ? undefined : data.coverUrl,
       notes: data.notes === undefined ? undefined : data.notes,
-      finishedAt,
     },
   });
 
