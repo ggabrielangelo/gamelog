@@ -130,3 +130,39 @@ todo, B01–B24).
   modo que B05 é um defeito isolado de formatação do total de horas.
 - **CT relacionado (Apêndice B):** CT32 (soma total de horas na
   home com 1 decimal).
+
+---
+
+## B06 — Login case-sensitive no e-mail
+
+- **Severidade:** baixa
+- **Categoria:** lógica (regra de negócio Seção 7.1 do CLAUDE.md:
+  e-mail é único case-insensitive, logo login deve ser também)
+- **Localização:** `apps/api/src/modules/auth/auth.schema.ts`
+  (schema `loginSchema`, campo `email`)
+- **Diff aplicado:**
+  ```diff
+   export const loginSchema = z.object({
+  -  email: z.string().trim().toLowerCase().email('E-mail inválido'),
+  +  email: z.string().trim().email('E-mail inválido'),
+     password: z.string().min(1, 'Senha é obrigatória'),
+   });
+  ```
+  **Nota de localização:** o enunciado desta injeção pedia a mudança
+  em `apps/api/src/modules/auth/auth.service.ts` (remover
+  `.toLowerCase()` antes de `prisma.user.findUnique`), mas na
+  implementação da `main` a normalização é feita no schema Zod
+  (`loginSchema` chama `.toLowerCase()` no transform), de modo que
+  o service recebe o e-mail já em caixa baixa e nunca precisou
+  rechamar `.toLowerCase()`. A injeção foi aplicada no local
+  funcionalmente equivalente — o schema de login — preservando o
+  schema de cadastro (`registerSchema` mantém `.toLowerCase()`).
+- **Sintoma esperado:** usuário cadastrado com e-mail
+  `teste@gamelog.com` consegue logar escrevendo exatamente dessa
+  forma, mas falha com `401 Credenciais inválidas` ao tentar
+  `Teste@Gamelog.com` ou `TESTE@GAMELOG.COM`. Como o `register`
+  continua normalizando para caixa baixa, a assimetria é observável
+  em qualquer teste que valide "cadastrou e logou com case
+  diferente".
+- **CT relacionado (Apêndice B):** CT05 (login válido com variações
+  de case no e-mail).
