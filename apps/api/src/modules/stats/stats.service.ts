@@ -51,7 +51,7 @@ export async function computeStats(userId: string): Promise<BacklogStats> {
     playing: counts.PLAYING,
     backlog: counts.BACKLOG,
     abandoned: counts.ABANDONED,
-    totalHours: hoursAgg._sum.hours ?? 0,
+    totalHours: 0,
     avgRating: avg,
   };
 }

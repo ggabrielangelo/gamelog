@@ -866,3 +866,46 @@ todo, B01–B24).
   título único de outro user — o teste automatizado ainda passa se
   o isolamento for garantido pela lista crua, mas o fluxo de busca
   deixa de funcionar).
+
+---
+
+## B24 — Dashboard `totalHours` sempre retorna zero
+
+- **Severidade:** média
+- **Categoria:** integração (regra de negócio Seção 7.12 do
+  CLAUDE.md: `totalHours` é soma agregada de todas as
+  `PlaySession.hours` do usuário)
+- **Localização:** `apps/api/src/modules/stats/stats.service.ts:54`
+  (campo `totalHours` do objeto retornado por `computeStats`)
+- **Diff aplicado:**
+  ```diff
+    return {
+      totalGames:
+        counts.BACKLOG + counts.PLAYING + counts.COMPLETED + counts.ABANDONED,
+      completed: counts.COMPLETED,
+      playing: counts.PLAYING,
+      backlog: counts.BACKLOG,
+      abandoned: counts.ABANDONED,
+  -   totalHours: hoursAgg._sum.hours ?? 0,
+  +   totalHours: 0,
+      avgRating: avg,
+    };
+  ```
+  (A chamada `prisma.playSession.aggregate` continua rodando — o
+  resultado `hoursAgg._sum.hours` fica calculado mas ignorado. É
+  "código morto proposital" para preservar custo de I/O e evitar
+  flags de linter óbvias ao remover a atribuição.)
+- **Sintoma esperado:** o cartão `dashboard-stat-total-hours` sempre
+  mostra `0` (ou `0.0` sem o B05, mas com B05 ativo mostra `0`
+  como inteiro). Mesmo que o usuário tenha dezenas de `PlaySession`
+  registradas, o Dashboard reporta zero horas. A contagem por
+  status (BACKLOG, PLAYING, etc.) continua correta — a avaliação
+  média também. A inconsistência entre "jogos jogando" > 0 e
+  "horas totais = 0" é a pista mais direta para detecção; combinado
+  com B05 (perda da casa decimal), o cartão fica particularmente
+  suspeito. Note que o **total de horas por jogo individual**
+  (`game-detail-hours-total`) continua correto — a função
+  `totalHours` em `games.service.ts` é separada, e B24 só afeta
+  a agregação global do Dashboard.
+- **CT relacionado (Apêndice B):** CT32 (soma total de horas no
+  Dashboard reflete sessões criadas).
