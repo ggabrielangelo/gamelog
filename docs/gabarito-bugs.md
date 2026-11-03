@@ -329,3 +329,46 @@ todo, B01–B24).
   depende da UI (string crua ou label vazia).
 - **CT relacionado (Apêndice B):** CT17 (edição rejeita plataforma
   inválida).
+
+---
+
+## B11 — `GET /games/:id` vaza jogos entre usuários
+
+- **Severidade:** média
+- **Categoria:** permissão / autorização (regra de negócio Seção 7.4
+  do CLAUDE.md: um usuário só enxerga seus próprios recursos)
+- **Localização:** `apps/api/src/modules/games/games.service.ts`
+  (função `getGame`)
+- **Diff aplicado:**
+  ```diff
+  - export async function getGame(userId: string, gameId: string) {
+  -   const game = await findOwnedGame(userId, gameId);
+  -   const hoursTotal = await totalHours(gameId);
+  -   return { ...game, hoursTotal };
+  - }
+  + export async function getGame(_userId: string, gameId: string) {
+  +   const game = await prisma.game.findUnique({ where: { id: gameId } });
+  +   if (!game) throw new HttpError(404, 'GAME_NOT_FOUND', 'Jogo não encontrado');
+  +   const hoursTotal = await totalHours(gameId);
+  +   return { ...game, hoursTotal };
+  + }
+  ```
+  **Nota de localização:** o enunciado pedia "remover o `userId` da
+  cláusula `where` e deixar só `where: { id }`". Na implementação da
+  `main`, o filtro de propriedade acontecia dentro do helper
+  `findOwnedGame(userId, gameId)`, que faz `findUnique({ where:
+  { id: gameId } })` seguido de uma checagem `game.userId !== userId
+  → 403`. A injeção bypassa esse helper só em `getGame`, fazendo o
+  `findUnique` direto por `id`. `updateGame`, `deleteGame`,
+  `createSession` e `listSessions` continuam chamando `findOwnedGame`
+  — a autorização dessas rotas segue íntegra.
+- **Sintoma esperado:** `GET /api/games/:id` passa a devolver **200
+  + payload do jogo** mesmo quando o jogo pertence a outro usuário,
+  desde que o chamador esteja autenticado (middleware JWT segue
+  ativo). O frontend que acessa `/games/:id` com um id de jogo
+  alheio renderiza o detalhe completo (título, plataforma, status,
+  sessões e horas totais). Edição e exclusão continuam bloqueadas
+  com `403` — a brecha é só de leitura.
+- **CT relacionado (Apêndice B):** CT12 (acesso a `/games/:id` de
+  outro usuário retorna 403/404), equivalente ao CT29 (isolamento
+  entre usuários na lista).

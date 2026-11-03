@@ -56,8 +56,9 @@ export async function createGame(userId: string, data: CreateGameInput) {
   return game;
 }
 
-export async function getGame(userId: string, gameId: string) {
-  const game = await findOwnedGame(userId, gameId);
+export async function getGame(_userId: string, gameId: string) {
+  const game = await prisma.game.findUnique({ where: { id: gameId } });
+  if (!game) throw new HttpError(404, 'GAME_NOT_FOUND', 'Jogo não encontrado');
   const hoursTotal = await totalHours(gameId);
   return { ...game, hoursTotal };
 }
