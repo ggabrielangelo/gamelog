@@ -3,6 +3,7 @@ import { authRouter } from './modules/auth/auth.routes';
 import { usersRouter } from './modules/users/users.routes';
 import { gamesRouter } from './modules/games/games.routes';
 import { statsRouter } from './modules/stats/stats.routes';
+import { adminRouter } from './modules/admin/admin.routes';
 
 export const apiRouter = Router();
 
@@ -14,3 +15,4 @@ apiRouter.use('/auth', authRouter);
 apiRouter.use('/users', usersRouter);
 apiRouter.use('/games', gamesRouter);
 apiRouter.use('/stats', statsRouter);
+apiRouter.use('/admin', adminRouter);

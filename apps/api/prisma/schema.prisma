@@ -1,4 +1,4 @@
-// GameLog — schema Prisma (SQLite local).
+// GameLog — schema Prisma (PostgreSQL / Supabase).
 // Fonte de verdade do modelo de dados: Seção 4 do CLAUDE.md.
 
 generator client {
@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
