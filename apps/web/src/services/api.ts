@@ -3,8 +3,10 @@ import type { ApiErrorBody } from '../types';
 
 export const TOKEN_STORAGE_KEY = 'gamelog.token';
 
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3333/api';
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3333/api',
+  baseURL,
   timeout: 15_000,
 });
 
