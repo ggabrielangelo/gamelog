@@ -24,6 +24,19 @@ todo, B01–B24).
 > intencionalmente deixado sem bug correspondente, mas há bugs
 > (B22, p.ex.) sem CT direto — observáveis apenas em sessão
 > exploratória (Cenário B).
+>
+> **REMOÇÕES DURANTE PILOTO (2026-11-10):** B19 e B20 foram
+> retirados da branch `buggy` por inviabilizarem o protocolo
+> experimental — ambos impedem que o QA externo crie uma conta
+> própria (B19 não persiste o usuário no banco, gerando
+> `P2003 Foreign key constraint violated` em qualquer `POST /games`
+> subsequente; B20 devolve falso sucesso em e-mail duplicado).
+> A numeração B01–B24 **não** foi renumerada: os IDs B19 e B20
+> permanecem no gabarito marcados como `REMOVIDO DURANTE PILOTO`
+> para preservar o rastreamento histórico. A distribuição efetiva
+> passa a ser **22 defeitos ativos** com perfil **10 baixa / 10
+> média / 2 alta** (B17 e B18 permanecem como os únicos de
+> severidade alta ativos).
 
 ---
 
@@ -638,6 +651,16 @@ todo, B01–B24).
 
 ## B19 — `POST /auth/register` retorna token mas usuário não é persistido
 
+> **STATUS: REMOVIDO DURANTE PILOTO (2026-11-10).** A injeção foi
+> revertida na branch `buggy` por inviabilizar o requisito
+> experimental de "QA externo cria conta própria" — sem persistir o
+> usuário, o `sub` do JWT fica desconectado da tabela `User` e
+> qualquer `POST /games` subsequente falha com `P2003 Foreign key
+> constraint violated: Game_userId_fkey`, bloqueando toda a sessão
+> exploratória. O ID `B19` não é renumerado; a descrição original
+> abaixo é preservada para rastreamento histórico, mas o código
+> correspondente foi restaurado à versão da `main`.
+
 - **Severidade:** alta
 - **Categoria:** lógica (regra de negócio Seção 7.1 do CLAUDE.md
   implícita: cadastro cria o usuário no banco)
@@ -707,6 +730,13 @@ todo, B01–B24).
 ---
 
 ## B20 — E-mail duplicado em cadastro retorna falso sucesso em vez de 400/409
+
+> **STATUS: REMOVIDO DURANTE PILOTO (2026-11-10).** Removido em
+> conjunto com B19, já que a correção do `registerUser` para
+> persistir o usuário restaura automaticamente o `throw new
+> HttpError(400, 'EMAIL_IN_USE', ...)` no ramo `if (existing)`. O
+> ID `B20` não é renumerado; a descrição original abaixo é
+> preservada para rastreamento histórico.
 
 - **Severidade:** alta
 - **Categoria:** lógica (regra de negócio Seção 7.1 do CLAUDE.md:
