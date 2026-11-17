@@ -1,0 +1,23 @@
+defeito,descricao,severidade,QA1-B,QA1-A,QA2-B,QA2-A,QA3-B,QA3-A,cenario_B,cenario_A,qualquer_manual,cenario_C_cypress,cypress_ct,qualquer_abordagem
+B01,Senha minima relaxada,baixa,0,0,0,0,0,0,0,0,0,0,,0
+B02,Titulo vazio aceito,baixa,0,0,0,1,0,0,0,1,1,0,,1
+B03,Nota fora de 1-10 aceita,baixa,0,0,0,1,0,0,0,1,1,0,,1
+B04,Sessao de 0h aceita,baixa,0,0,0,1,0,0,0,1,1,1,CT25a,1
+B05,Horas do dashboard sem decimal,baixa,0,0,0,0,0,0,0,0,0,0,,0
+B06,Login sensivel a maiusculas no e-mail,baixa,0,0,0,0,0,0,0,0,0,0,,0
+B07,finishedAt nao limpo ao sair de Concluido,baixa,0,0,0,0,0,0,0,0,0,0,,0
+B08,Selo de status em ingles,baixa,0,0,0,0,1,1,1,1,1,1,CT18 CT28,1
+B09,finishedAt nao preenchido ao concluir,media,0,1,0,1,0,1,0,1,1,1,CT20,1
+B10,Edicao aceita plataforma invalida,media,0,0,0,0,0,0,0,0,0,0,,0
+B11,GET de jogo alheio,media,0,0,0,1,0,0,0,1,1,0,,1
+B12,Confirmacao de senha nao validada,media,0,0,0,0,0,0,0,0,0,0,,0
+B13,Logout nao limpa estado,media,0,0,0,0,0,0,0,0,0,0,,0
+B14,Erro do formulario em verde,media,0,0,0,0,0,0,0,0,0,0,,0
+B15,Sessoes sem ordenacao,media,0,0,0,0,0,0,0,0,0,0,,0
+B16,PATCH parcial apaga notas,media,0,0,0,0,0,0,0,0,0,0,,0
+B17,PATCH em jogo alheio,alta,0,0,0,1,0,0,0,1,1,1,CT15,1
+B18,DELETE em jogo alheio,alta,0,0,0,1,0,0,0,1,1,0,,1
+B21,Media 0.0 sem avaliacoes,baixa,0,0,0,0,0,0,0,0,0,0,,0
+B22,Edicao reseta addedAt,baixa,0,0,0,1,0,0,0,1,1,0,,1
+B23,Busca por titulo ignorada,media,1,0,1,1,1,0,1,1,1,0,,1
+B24,Total de horas sempre 0,media,0,0,1,1,0,1,1,1,1,1,CT32,1

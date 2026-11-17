@@ -1,0 +1,33 @@
+qa,sessao,relato,classificacao,defeito_gabarito
+QA1,B,Sugestao 1 - sem confirmacao de e-mail,sugestao,
+QA1,B,Erro 1 - capa nao exibida,defeito nativo (a confirmar na main),
+QA1,B,Sugestao 2 - campo Nota aceita digitar acima do maximo,sugestao,
+QA1,B,Erro 2 - F5/link direto Not Found,ambiente (hospedagem),
+QA1,B,Erro 3 - busca nao filtra,injetado,B23
+QA1,A,CT20 - finishedAt nao preenchido,injetado,B09
+QA2,B,Erro 500 ao salvar jogo,injetado removido no piloto,B19
+QA2,B,Busca sempre traz todos,injetado,B23
+QA2,B,Horas do dashboard,injetado,B24
+QA2,A,CT14 - edicao aceita titulo vazio,injetado,B02
+QA2,A,CT15 - edita jogo de outro usuario,injetado,B17
+QA2,A,CT20 - finishedAt,injetado,B09
+QA2,A,CT23 - nota fora do intervalo,injetado,B03
+QA2,A,CT25 - sessao 0h,injetado,B04
+QA2,A,CT29 - ve e exclui jogo de outro usuario,injetado,B11+B18
+QA2,A,CT32 - totalHours 0,injetado,B24
+QA2,A,CT13 - edicao sobrescreve addedAt,injetado,B22
+QA2,A,CT28 - search ignorado,injetado,B23
+QA2,A,CT27 - hoursTotal ausente na listagem,nao e defeito pela especificacao,
+QA3,B,Notas longas estouram o cartao,defeito nativo,
+QA3,B,Header com limite,defeito nativo (mesmo defeito das notas),
+QA3,B,Filtro de busca nao funciona,injetado,B23
+QA3,B,Status diferente entre telas,injetado,B08
+QA3,B,Faixa branca ao excluir,defeito nativo,
+QA3,B,Carregamento infinito apos inatividade,ambiente (provavel),
+QA3,A,CT01 - timeout no cadastro,ambiente (hospedagem),
+QA3,A,CT11 - plataforma invalida,nao testado,
+QA3,A,CT15 - jogo de outro usuario,nao testado,
+QA3,A,CT20 - finishedAt,injetado,B09
+QA3,A,CT18 - status nao esta em portugues,injetado,B08
+QA3,A,CT32 - soma de horas,injetado,B24
+QA3,A,CT19 - pulado,nao testado,
