@@ -92,6 +92,22 @@ gamelog/
 - **`buggy`** — bifurcada da `v1.0-experimento` com 24 defeitos
   injetados (B01–B24), perfil 10 baixa / 10 média / 4 alta.
 
+## Artefatos do TCC
+
+Os artefatos de suporte à pesquisa estão distribuídos no repositório da
+seguinte forma:
+
+- **Requisitos funcionais e bateria de casos de teste:**
+  [`docs/material-suplementar.pdf`](./docs/material-suplementar.pdf)
+  (nesta branch `main`).
+- **Suíte Cypress automatizada:** pasta [`e2e/`](./e2e/), congelada na
+  tag `v1.0-experimento`.
+- **Gabarito dos 24 defeitos injetados (B01–B24):**
+  `docs/gabarito-bugs.md`, na branch `buggy`.
+- **Dados brutos do experimento** (tempos de execução, matriz de
+  detecção, classificação de relatos): pasta `experimento/`, na
+  branch `buggy`.
+
 ## Licença
 
 Uso acadêmico — TCC UNIT 2026. Sem licença de redistribuição definida.
